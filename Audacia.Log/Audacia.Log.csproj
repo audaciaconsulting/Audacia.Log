@@ -2,6 +2,9 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
+		<Description>Standardized SeriLog logging configuration for Audacia projects.</Description>
+		<Copyright>Copyright © Audacia 2019</Copyright>
+		<PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
