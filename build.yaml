@@ -14,7 +14,7 @@ stages:
 - stage: Build
   displayName: Build
   jobs:
-  - template: jobs/build/netcore/package.yaml@templates
+  - template: jobs/build/netcore/package.yaml@templates 
 
 - stage: Release
   displayName: Release
