@@ -15,7 +15,7 @@ namespace Audacia.Log
 		/// <summary>Configure loggers to use the default sinks.</summary>
 		public static LoggerConfiguration Defaults(
 			this LoggerSinkConfiguration configuration,
-			string environmentName,
+			bool development,
 			string appInsightsKey,
 			string slackUrl)
 		{
@@ -26,12 +26,13 @@ namespace Audacia.Log
 				.EventLog(entryAssembly ?? callingAssembly, restrictedToMinimumLevel: LogEventLevel.Warning)
 				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
 
-			if (!Debugger.IsAttached && !environmentName.Equals("local", StringComparison.OrdinalIgnoreCase))
+			if (!development)
 				return loggerConfiguration
 					.WriteTo.Slack(slackUrl, restrictedToMinimumLevel: LogEventLevel.Error)
 					.WriteTo.ApplicationInsightsTraces(appInsightsKey, LogEventLevel.Information);
 
-			return loggerConfiguration;
+			return loggerConfiguration
+				.WriteTo.ApplicationInsightsTraces(Guid.Empty.ToString(), LogEventLevel.Information);
 		}
 	}
 }
