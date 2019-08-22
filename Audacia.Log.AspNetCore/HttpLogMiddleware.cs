@@ -47,7 +47,7 @@ namespace Audacia.Log.AspNetCore
                     httpContext.Request.HasFormContentType
                 };
 
-                var user = new {httpContext.User.Claims, httpContext.User.Identities, httpContext.User.Identity};
+                var user = new {httpContext.User?.Claims, httpContext.User?.Identities, httpContext.User?.Identity};
 
                 var connection = new
                 {
@@ -76,7 +76,7 @@ namespace Audacia.Log.AspNetCore
 
                 var response = httpContext.Response == null ? null : new
                 {
-                    Headers = httpContext.Response.Headers.Select(x => x.Key + ": " + x.Value),
+                    Headers = httpContext.Response.Headers?.Select(x => x.Key + ": " + x.Value),
                     httpContext.Response.ContentLength,
                     httpContext.Response.ContentType
                 };

@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
@@ -10,13 +13,18 @@ namespace Audacia.Log.AspNetCore
 
 		public ActionLogFilter(ILogger logger) => _logger = logger.ForContext<ActionFilterAttribute>();
 
+		public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
+		
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{
 			
 			var log = _logger.ForContext("Arguments", context.ActionArguments, true);
 
 			if (context.Controller is Controller controller)
-				log = log.ForContext("User", controller.User, true);
+			{
+				var claims = controller.User?.Claims.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
+				log = log.ForContext("Claims", claims, true);
+			}
 			
 			log.Information("Action Executing: {Action}.", context.ActionDescriptor.DisplayName);
 			base.OnActionExecuting(context);
@@ -32,7 +40,10 @@ namespace Audacia.Log.AspNetCore
 			var log = context.Exception == null ? _logger : _logger.ForContext("Exception", context.Exception, true);
 			
 			if (context.Controller is Controller controller)
-				log = log.ForContext("User", controller.User, true);
+			{
+				var claims = controller.User?.Claims.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
+				log = log.ForContext("Claims", claims, true);
+			}
 
 			if (result == null) log.Information("Action Executed: {Action}.", actionName);
 			else log.Information("Action Executed: {ModelType} returned from {Action}.", resultType, actionName);
