@@ -7,15 +7,17 @@ namespace Audacia.Log
 		/// <summary>Creates a default logger config with enrichers and sinks.</summary>
 		public static LoggerConfiguration ConfigureDefaults(
 			this LoggerConfiguration configuration,
-			bool isDevelopment,
+			string applicationName,
 			string environmentName,
+			bool isDevelopment,
 			string appInsightsKey,
+			string dataDogKey,
 			string slackUrl)
 		{
 			return configuration
 				.MinimumLevel.Verbose()
 				.Enrich.WithDefaults(environmentName)
-				.WriteTo.Defaults(isDevelopment, appInsightsKey, slackUrl);
+				.WriteTo.Defaults(applicationName, isDevelopment, appInsightsKey, dataDogKey, slackUrl); 
 		}
 	}
 }

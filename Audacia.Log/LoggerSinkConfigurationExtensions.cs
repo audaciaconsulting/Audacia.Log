@@ -15,20 +15,20 @@ namespace Audacia.Log
 		/// <summary>Configure loggers to use the default sinks.</summary>
 		public static LoggerConfiguration Defaults(
 			this LoggerSinkConfiguration configuration,
+			string applicationName,
 			bool development,
 			string appInsightsKey,
+			string dataDogKey,
 			string slackUrl)
 		{
-			var entryAssembly = Assembly.GetEntryAssembly()?.GetName().Name;
-			var callingAssembly = Assembly.GetCallingAssembly().GetName().Name;
-
 			var loggerConfiguration = configuration
-				.EventLog(entryAssembly ?? callingAssembly, restrictedToMinimumLevel: LogEventLevel.Warning)
+				.EventLog(applicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
 				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
 
 			if (!development)
 				return loggerConfiguration
 					.WriteTo.Slack(slackUrl, restrictedToMinimumLevel: LogEventLevel.Error)
+					.WriteTo.DatadogLogs(dataDogKey, host: Environment.MachineName, service: applicationName, logLevel: LogEventLevel.Debug)
 					.WriteTo.ApplicationInsightsTraces(appInsightsKey, LogEventLevel.Information);
 
 			return loggerConfiguration
