@@ -35,7 +35,7 @@ namespace Audacia.Log.AspNetCore
             {
                 var request = new
                 {
-                    Headers = httpContext.Request.Headers.Where(h => h.Key != "Authorization").Select(x => x.Key + ": " + x.Value),
+                    Headers = httpContext.Request.Headers?.Where(h => h.Key != "Authorization").Select(x => x.Key + ": " + x.Value),
                     httpContext.Request.Host.Value,
                     httpContext.Request.Method,
                     Path = httpContext.Request.Path.Value,
@@ -52,7 +52,7 @@ namespace Audacia.Log.AspNetCore
                 var connection = new
                 {
                     httpContext.Connection.Id,
-                    ClientCertificate = httpContext.Connection.ClientCertificate.FriendlyName,
+                    ClientCertificate = httpContext.Connection.ClientCertificate?.FriendlyName,
                     httpContext.Connection.LocalPort,
                     httpContext.Connection.RemotePort,
                     httpContext.Connection.LocalIpAddress,
