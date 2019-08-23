@@ -47,8 +47,6 @@ namespace Audacia.Log.AspNetCore
                     httpContext.Request.HasFormContentType
                 };
 
-                var user = new {httpContext.User?.Claims, httpContext.User?.Identities, httpContext.User?.Identity};
-
                 var connection = new
                 {
                     httpContext.Connection.Id,
@@ -61,7 +59,6 @@ namespace Audacia.Log.AspNetCore
 
                 var requestLog = _logger
                     .ForContext("Request", request, true)
-                    .ForContext("User", user, true)
                     .ForContext("Connection", connection, true);
 
 
