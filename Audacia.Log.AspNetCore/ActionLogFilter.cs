@@ -22,8 +22,10 @@ namespace Audacia.Log.AspNetCore
 
 			if (context.Controller is Controller controller)
 			{
-				var claims = controller.User?.Claims.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
-				log = log.ForContext("Claims", claims, true);
+				var claims = controller.User?.Claims?.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
+				
+				if (claims != null && claims.Any())
+					log = log.ForContext("Claims", claims, true);
 			}
 			
 			log.Information("Action Executing: {Action}.", context.ActionDescriptor.DisplayName);
@@ -42,7 +44,9 @@ namespace Audacia.Log.AspNetCore
 			if (context.Controller is Controller controller)
 			{
 				var claims = controller.User?.Claims.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
-				log = log.ForContext("Claims", claims, true);
+				
+				if (claims != null && claims.Any())
+					log = log.ForContext("Claims", claims, true);
 			}
 
 			if (result == null) log.Information("Action Executed: {Action}.", actionName);
