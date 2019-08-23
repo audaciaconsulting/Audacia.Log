@@ -10,7 +10,7 @@ namespace Audacia.Log.AspNetCore
 	{
 		private readonly ILogger _logger;
 
-		public ActionLogFilter(ILogger logger) => _logger = logger.ForContext<ActionFilterAttribute>();
+		public ActionLogFilter(ILogger logger) => _logger = logger.ForContext<ActionLogFilter>();
 
 		public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
 		
