@@ -16,32 +16,24 @@ namespace Audacia.Log
 			string applicationName,
 			bool development,
 			string appInsightsKey,
-			string dataDogKey,
 			string slackUrl)
 		{
 			var loggerConfiguration = configuration
 				.EventLog(applicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
 				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
 
-			if (!development)
-			{
-				if (slackUrl != null)
-					loggerConfiguration = loggerConfiguration.WriteTo.Slack(slackUrl, restrictedToMinimumLevel: LogEventLevel.Error);
+			if (development)
+				return loggerConfiguration.WriteTo
+					.ApplicationInsightsTraces(Guid.Empty.ToString(), LogEventLevel.Information);
 
-				if (dataDogKey != null)
-					loggerConfiguration = loggerConfiguration.WriteTo.DatadogLogs(dataDogKey, 
-						host: Environment.MachineName, 
-						service: applicationName, 
-						logLevel: LogEventLevel.Debug);
-						
-				if (appInsightsKey != null)
-					loggerConfiguration = loggerConfiguration.WriteTo.ApplicationInsightsTraces(appInsightsKey, LogEventLevel.Information);
+			if (slackUrl != null)
+				loggerConfiguration = loggerConfiguration.WriteTo.Slack(slackUrl, restrictedToMinimumLevel: LogEventLevel.Error);
 
-				return loggerConfiguration;
-			}
+			if (appInsightsKey != null)
+				loggerConfiguration = loggerConfiguration.WriteTo.ApplicationInsightsTraces(appInsightsKey, LogEventLevel.Information);
 
-			return loggerConfiguration
-				.WriteTo.ApplicationInsightsTraces(Guid.Empty.ToString(), LogEventLevel.Information);
+			return loggerConfiguration;
+
 		}
 	}
 }

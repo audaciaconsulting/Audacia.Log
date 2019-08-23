@@ -11,13 +11,12 @@ namespace Audacia.Log
 			string environmentName,
 			bool isDevelopment,
 			string appInsightsKey,
-			string dataDogKey,
 			string slackUrl)
 		{
 			return configuration
 				.MinimumLevel.Defaults()
 				.Enrich.WithDefaults(environmentName)
-				.WriteTo.Defaults(applicationName, isDevelopment, appInsightsKey, dataDogKey, slackUrl); 
+				.WriteTo.Defaults(applicationName, isDevelopment, appInsightsKey, slackUrl); 
 		}
 	}
 }
