@@ -1,6 +1,4 @@
 using System;
-using System.Diagnostics;
-using System.Reflection;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
@@ -26,10 +24,21 @@ namespace Audacia.Log
 				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
 
 			if (!development)
-				return loggerConfiguration
-					.WriteTo.Slack(slackUrl, restrictedToMinimumLevel: LogEventLevel.Error)
-					.WriteTo.DatadogLogs(dataDogKey, host: Environment.MachineName, service: applicationName, logLevel: LogEventLevel.Debug)
-					.WriteTo.ApplicationInsightsTraces(appInsightsKey, LogEventLevel.Information);
+			{
+				if (slackUrl != null)
+					loggerConfiguration = loggerConfiguration.WriteTo.Slack(slackUrl, restrictedToMinimumLevel: LogEventLevel.Error);
+
+				if (dataDogKey != null)
+					loggerConfiguration = loggerConfiguration.WriteTo.DatadogLogs(dataDogKey, 
+						host: Environment.MachineName, 
+						service: applicationName, 
+						logLevel: LogEventLevel.Debug);
+						
+				if (appInsightsKey != null)
+					loggerConfiguration = loggerConfiguration.WriteTo.ApplicationInsightsTraces(appInsightsKey, LogEventLevel.Information);
+
+				return loggerConfiguration;
+			}
 
 			return loggerConfiguration
 				.WriteTo.ApplicationInsightsTraces(Guid.Empty.ToString(), LogEventLevel.Information);

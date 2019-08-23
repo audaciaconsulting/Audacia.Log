@@ -55,8 +55,8 @@ namespace Audacia.Log.AspNetCore
                     ClientCertificate = httpContext.Connection.ClientCertificate?.FriendlyName,
                     httpContext.Connection.LocalPort,
                     httpContext.Connection.RemotePort,
-                    httpContext.Connection.LocalIpAddress,
-                    httpContext.Connection.RemoteIpAddress,
+                    LocalIpAddress = httpContext.Connection.LocalIpAddress.ToString(),
+                    RemoteIpAddress = httpContext.Connection.RemoteIpAddress.ToString(),
                 };
 
                 var requestLog = _logger

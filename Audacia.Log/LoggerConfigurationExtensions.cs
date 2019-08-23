@@ -15,7 +15,7 @@ namespace Audacia.Log
 			string slackUrl)
 		{
 			return configuration
-				.MinimumLevel.Verbose()
+				.MinimumLevel.Defaults()
 				.Enrich.WithDefaults(environmentName)
 				.WriteTo.Defaults(applicationName, isDevelopment, appInsightsKey, dataDogKey, slackUrl); 
 		}

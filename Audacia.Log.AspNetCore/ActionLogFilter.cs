@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +42,7 @@ namespace Audacia.Log.AspNetCore
 			
 			if (context.Controller is Controller controller)
 			{
-				var claims = controller.User?.Claims.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
+				var claims = controller.User?.Claims?.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
 				
 				if (claims != null && claims.Any())
 					log = log.ForContext("Claims", claims, true);
