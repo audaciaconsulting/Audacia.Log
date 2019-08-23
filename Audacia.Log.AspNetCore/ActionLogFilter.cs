@@ -16,10 +16,9 @@ namespace Audacia.Log.AspNetCore
 		
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{
-			
 			var log = _logger.ForContext("Arguments", context.ActionArguments, true);
 
-			if (context.Controller is Controller controller)
+			if (context.Controller is Controller controller && IncludeClaims.Any())
 			{
 				var claims = controller.User?.Claims?.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
 				
@@ -40,7 +39,7 @@ namespace Audacia.Log.AspNetCore
 
 			var log = context.Exception == null ? _logger : _logger.ForContext("Exception", context.Exception, true);
 			
-			if (context.Controller is Controller controller)
+			if (context.Controller is Controller controller && IncludeClaims.Any())
 			{
 				var claims = controller.User?.Claims?.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
 				
