@@ -34,7 +34,7 @@ namespace Audacia.Log.AspNetCore
 		public override void OnActionExecuted(ActionExecutedContext context)
 		{
 			// kinda smells but is there a better way? I think not.
-			var result = context.Result.GetType().GetProperty("Value")?.GetValue(context.Result);
+			var result = context.Result?.GetType().GetProperty("Value")?.GetValue(context.Result);
 			var resultType = result?.GetType().Name;
 			var actionName = context.ActionDescriptor.DisplayName;
 
