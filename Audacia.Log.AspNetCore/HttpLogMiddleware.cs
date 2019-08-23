@@ -66,9 +66,9 @@ namespace Audacia.Log.AspNetCore
 
                 await _next(httpContext);
 
-                var statusCode = httpContext.Response?.StatusCode;
-                var level = (statusCode.GetValueOrDefault() > 499 ? statusCode.HasValue ? 1 : 0 : 0) != 0
-                    ? LogEventLevel.Error
+                var statusCode = httpContext.Response?.StatusCode ?? 0;
+                var level = statusCode > 499 ? LogEventLevel.Error
+                    : statusCode > 366 ? LogEventLevel.Warning 
                     : LogEventLevel.Information;
 
                 var response = httpContext.Response == null ? null : new
