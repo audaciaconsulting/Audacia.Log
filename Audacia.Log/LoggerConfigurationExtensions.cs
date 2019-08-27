@@ -1,3 +1,4 @@
+using Microsoft.ApplicationInsights.Extensibility;
 using Serilog;
 
 namespace Audacia.Log
@@ -13,6 +14,8 @@ namespace Audacia.Log
 			string appInsightsKey,
 			string slackUrl)
 		{
+			TelemetryConfiguration.Active.InstrumentationKey = appInsightsKey;
+			
 			return configuration
 				.MinimumLevel.Defaults()
 				.Enrich.WithDefaults(environmentName)
