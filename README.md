@@ -8,25 +8,31 @@ This package provides extension methods for adding the standard set of enrichers
 
 ```c#
 
-// This is the 
+// This is the configuration object used to specify settings for the logger.
 var config = new LogConfig
 {
+    ApplicationName = "
     EnvironmentName = "Development"; // The name of the environment the application is currently running in.
     IsDevelopment = false; // Specify whether or not this is a development environment, in which only trace sinks are used, and application insights output is sent to a local loopback.
     ApplicationInsightsKey = "00000000-0000-0000-0000-000000000000"; // The instrumentation key of an application insights resource.
     SlackUrl = "[Slack Webhook]"; // The URL of a slack webhook to send error-level messages to.
 }
+```
 
-// Set up the Serilog logger with all the default settings:
+Set up the Serilog logger with all the default settings:
+
+```c#
 Log.Logger = new LoggerConfiguration().ConfigureDefaults(config);
+```
 
-// Alternatively, we can individually set minimum levels, enrichers, and sinks.
+Alternatively, we can individually set minimum levels, enrichers, and sinks.
+
+```c#
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Defaults() // Sets the default log levels (including filtering out noise from Microsoft and IdentityServer4 modules).
     .Enrich.WithDefaults(config) // add the default enrichers.
     .WriteTo.Defaults(config) // add the default sinks.
     .CreateLogger();
-
 ```
 
 In this example the arguments provided are as follows:
