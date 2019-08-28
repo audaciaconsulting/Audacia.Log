@@ -41,7 +41,7 @@ In this example the arguments provided are as follows:
 
 `isDevelopment`: Specifies whether the application is running in a development environment. If it is, application insights logs get sent to a local loopback and slack messages are suppressed.
 
-`appInsightsKey`: This is the telemetry key for the application insights azure resource.
+`appInsightsKey`: This is the telemetry key for the application insights azure resource. If this value is `null` logs will not be sent.
 
-`slackUrl`: This is a URL for a slack webhook to which to send messages. Only error-level logs and above are sent.
+`slackUrl`: This is a URL for a slack webhook to which to send messages. Only error-level logs and above are sent. If this value is `null` logs will not be sent.
 
