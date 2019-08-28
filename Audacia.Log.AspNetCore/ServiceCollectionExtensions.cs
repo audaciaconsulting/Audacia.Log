@@ -10,20 +10,10 @@ namespace Audacia.Log.AspNetCore
 			ILogger logger = null)
 		{
 			TelemetryConfiguration.Active.InstrumentationKey = config.ApplicationInsightsKey;
-
-			Serilog.Log.Logger = new LoggerConfiguration()
-				.ConfigureDefaults(
-					config.ApplicationName,
-					config.EnvironmentName,
-					config.IsDevelopment,
-					config.ApplicationInsightsKey,
-					config.SlackUrl
-				)
-				.CreateLogger();
-
+			
 			return services
 				.AddSingleton(logger ?? Serilog.Log.Logger)
-				.AddApplicationInsightsTelemetry("00000000-0000-0000-0000-000000000000");
+				.AddApplicationInsightsTelemetry(config.ApplicationInsightsKey);
 		}
 	}
 }
