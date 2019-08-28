@@ -6,13 +6,13 @@ namespace Audacia.Log.AspNetCore
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static IServiceCollection ConfigureLogging(this IServiceCollection services, LogConfig config,
-			ILogger logger = null)
+		public static IServiceCollection ConfigureLogging(this IServiceCollection services, LogConfig config, ILogger logger = null)
 		{
 			TelemetryConfiguration.Active.InstrumentationKey = config.ApplicationInsightsKey;
 			
 			return services
 				.AddSingleton(logger ?? Serilog.Log.Logger)
+				.AddLogging(l => l.AddSerilog())
 				.AddApplicationInsightsTelemetry(config.ApplicationInsightsKey);
 		}
 	}
