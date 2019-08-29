@@ -13,7 +13,7 @@ namespace Audacia.Log.AspNetCore
 				.UseApplicationInsights(config.ApplicationInsightsKey);
 		}
 		/// <summary>Reads the log configuration from the application's appsettings.json</summary>
-		public static IWebHostBuilder ConfigureLogging(this IWebHostBuilder builder, string section = "LogConfig")
+		public static IWebHostBuilder ConfigureLogging(this IWebHostBuilder builder, string section = "Logging")
 		{
 			var configuration = new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
