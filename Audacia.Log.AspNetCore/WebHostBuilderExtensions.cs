@@ -19,7 +19,7 @@ namespace Audacia.Log.AspNetCore
 				.AddJsonFile("appsettings.json")
 				.Build();
 			
-			var config = configuration.LogConfig();
+			var config = configuration.LogConfig(section);
 			
 			return builder.UseSerilog()
 				.UseApplicationInsights(config.ApplicationInsightsKey);
