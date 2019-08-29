@@ -5,7 +5,7 @@ namespace Audacia.Log.AspNetCore
 	public static class ConfigurationExtensions
 	{
 		/// <summary>Reads the log configuration from the application's appsettings.json</summary>
-		public static LogConfig LogConfig(this IConfiguration config, string section = "LogConfig")
+		public static LogConfig LogConfig(this IConfiguration config, string section = "Logging")
 		{
 			return new LogConfig
 			{
