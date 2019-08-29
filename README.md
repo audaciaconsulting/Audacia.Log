@@ -1,6 +1,7 @@
 ## Audacia.Log
 
-Standardized logging configuration for Audacia projects using Serilog.
+Standardized logging configuration for Audacia projects using [Serilog](https://serilog.net).
+If you're adding this to a ASP.NET Core web project, Then follow [these instructions]() after finishing the base configuration detailed below.
 
 ### Usage
 
@@ -19,10 +20,13 @@ var config = new LogConfig
 }
 ```
 
-Set up the Serilog logger with all the default settings:
+Set up the Serilog logger with all the default settings. This should be done in the main entry point of your app:
 
 ```c#
-Log.Logger = new LoggerConfiguration().ConfigureDefaults(config);
+public static void Main(string[] args)
+{
+    Log.Logger = new LoggerConfiguration().ConfigureDefaults(config);
+}
 ```
 
 Alternatively, we can individually set minimum levels, enrichers, and sinks.
