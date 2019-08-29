@@ -25,4 +25,17 @@ namespace Audacia.Log.AspNetCore
 				.UseApplicationInsights(config.ApplicationInsightsKey);
 		}
 	}
+
+	public static class LoggerConfigurationExtensions
+	{
+		public static LoggerConfiguration ConfigureDefaults(this LoggerConfiguration loggerConfig, string section = "Logging")
+		{
+			var configuration = new ConfigurationBuilder()
+				.AddJsonFile("appsettings.json")
+				.Build();
+			
+			var config = configuration.LogConfig(section);
+			return loggerConfig.ConfigureDefaults(config);
+		}
+	}
 }
