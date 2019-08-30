@@ -1,7 +1,7 @@
 ## Audacia.Log
 
 Standardized logging configuration for Audacia projects using [Serilog](https://serilog.net).
-If you're adding this to a ASP.NET Core web project, Then follow [these instructions]() after finishing the base configuration detailed below.
+If you're adding this to a ASP.NET Core web project, Then follow [these instructions](https://dev.azure.com/audacia/Audacia/_git/Audacia.Log?path=%2FAudacia.Log.AspNetCore&_a=readme) after finishing the base configuration detailed below.
 
 ### Usage
 
