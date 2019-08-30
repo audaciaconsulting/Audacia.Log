@@ -1,3 +1,4 @@
+using System;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +20,11 @@ namespace Audacia.Log.AspNetCore
 		
 		public static IServiceCollection ConfigureLogging(this IServiceCollection services, string section = "Logging", ILogger logger = null)
 		{
+			var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+			
 			var configuration = new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
+				.AddJsonFile($"appsettings.{envName}.json")
 				.Build();
 			
 			var config = configuration.LogConfig(section);
