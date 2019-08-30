@@ -15,8 +15,10 @@ namespace Audacia.Log.AspNetCore
 		/// <summary>Reads the log configuration from the application's appsettings.json</summary>
 		public static IWebHostBuilder ConfigureLogging(this IWebHostBuilder builder, string section = "Logging")
 		{
+			var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 			var configuration = new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
+				.AddJsonFile($"appsettings.{envName}.json");
 				.Build();
 			
 			var config = configuration.LogConfig(section);
