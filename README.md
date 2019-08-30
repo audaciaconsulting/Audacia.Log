@@ -1,7 +1,7 @@
 ## Audacia.Log
 
 Standardized logging configuration for Audacia projects using [Serilog](https://serilog.net).
-If you're adding this to a ASP.NET Core web project, Then follow [these instructions]() after finishing the base configuration detailed below.
+If you're adding this to a ASP.NET Core web project, Then follow [these instructions](https://dev.azure.com/audacia/Audacia/_git/Audacia.Log?path=%2FAudacia.Log.AspNetCore&_a=readme) after finishing the base configuration detailed below.
 
 ### Usage
 
@@ -15,8 +15,8 @@ var config = new LogConfig
     ApplicationName = "Example App"; // The name of the application domain.
     EnvironmentName = "Development"; // The name of the environment the application is currently running in.
     IsDevelopment = false; // Specify whether or not this is a development environment, in which only trace sinks are used, and application insights output is sent to a local loopback.
-    ApplicationInsightsKey = "00000000-0000-0000-0000-000000000000"; // The instrumentation key of an application insights resource.
-    SlackUrl = "[Slack Webhook]"; // The URL of a slack webhook to send error-level messages to.
+    ApplicationInsightsKey = "00000000-0000-0000-0000-000000000000"; // The instrumentation key of an application insights resource. This is ignored if its null.
+    SlackUrl = "[Slack Webhook]"; // The URL of a slack webhook to send error-level messages to. This is ignored if its null.
 }
 ```
 
@@ -38,14 +38,3 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Defaults(config) // add the default sinks.
     .CreateLogger();
 ```
-
-In this example the arguments provided are as follows:
-
-`environmentName`: This should be an identifier for the environment that the logs are being sent from. 
-
-`isDevelopment`: Specifies whether the application is running in a development environment. If it is, application insights logs get sent to a local loopback and slack messages are suppressed.
-
-`appInsightsKey`: This is the telemetry key for the application insights azure resource. If this value is `null` logs will not be sent.
-
-`slackUrl`: This is a URL for a slack webhook to which to send messages. Only error-level logs and above are sent. If this value is `null` logs will not be sent.
-
