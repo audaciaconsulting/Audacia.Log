@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -18,7 +19,7 @@ namespace Audacia.Log.AspNetCore
 			var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 			var configuration = new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
-				.AddJsonFile($"appsettings.{envName}.json");
+				.AddJsonFile($"appsettings.{envName}.json")
 				.Build();
 			
 			var config = configuration.LogConfig(section);
