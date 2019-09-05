@@ -1,6 +1,6 @@
 namespace Audacia.Log
 {
-	public class LogConfig
+	public class AudaciaLoggerConfiguration
 	{
 		public string ApplicationName { get; set; }
 

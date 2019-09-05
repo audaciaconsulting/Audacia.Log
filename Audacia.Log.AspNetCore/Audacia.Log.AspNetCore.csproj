@@ -5,6 +5,16 @@
 		<Description>Standardized SeriLog logging configuration for Audacia Web APIs.</Description>
 		<Copyright>Copyright © Audacia 2019</Copyright>
 		<PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
+		<PackageVersion>0.1.0</PackageVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+	  <DocumentationFile>bin\Debug\Audacia.Log.AspNetCore.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+	  <DocumentationFile>bin\Release\Audacia.Log.AspNetCore.xml</DocumentationFile>
+	  <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -11,6 +11,7 @@ namespace Audacia.Log
 			configuration
 				.Verbose()
 				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-				.MinimumLevel.Override("IdentityServer4", LogEventLevel.Warning);
+				.MinimumLevel.Override("IdentityServer4", LogEventLevel.Warning)
+				.MinimumLevel.Override("IdentityServer4.Validation.TokenValidator", LogEventLevel.Fatal);
 	}
 }

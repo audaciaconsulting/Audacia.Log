@@ -4,8 +4,10 @@ using Serilog;
 
 namespace Audacia.Log.AspNetCore
 {
+	/// <summary>Extension methods for configuring default logging for an ASP.NET Core application.</summary>
 	public static class LoggerConfigurationExtensions
 	{
+		/// <summary>Configure default logging for an ASP.NET Core application.</summary>
 		public static LoggerConfiguration ConfigureDefaults(this LoggerConfiguration loggerConfig, string section = "Logging")
 		{
 			var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");

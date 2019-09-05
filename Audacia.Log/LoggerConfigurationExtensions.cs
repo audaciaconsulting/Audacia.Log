@@ -6,14 +6,14 @@ namespace Audacia.Log
 	public static class LoggerConfigurationExtensions
 	{
 		/// <summary>Creates a default logger config with enrichers and sinks.</summary>
-		public static LoggerConfiguration ConfigureDefaults(this LoggerConfiguration configuration, LogConfig config)
+		public static LoggerConfiguration ConfigureDefaults(this LoggerConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
 		{
-			TelemetryConfiguration.Active.InstrumentationKey = config.ApplicationInsightsKey;
+			TelemetryConfiguration.Active.InstrumentationKey = audaciaConfig.ApplicationInsightsKey;
 			
-			return configuration
+			return config
 				.MinimumLevel.Defaults()
-				.Enrich.WithDefaults(config)
-				.WriteTo.Defaults(config); 
+				.Enrich.WithDefaults(audaciaConfig)
+				.WriteTo.Defaults(audaciaConfig); 
 		}
 	}
 }

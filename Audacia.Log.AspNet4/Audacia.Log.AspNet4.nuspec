@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<package>
+	<metadata>
+		<id>$id$</id>
+		<version>$version$</version>
+		<title>$title$</title>
+		<description>$description$</description>
+		<authors>$author$</authors>
+		<copyright>$copyright$</copyright>
+		<iconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</iconUrl>
+	</metadata>
+</package>

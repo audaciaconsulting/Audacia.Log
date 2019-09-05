@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -6,17 +7,26 @@ using Serilog;
 
 namespace Audacia.Log.AspNetCore
 {
+	/// <summary>Logs requests and responses for each Controller Action.</summary>
 	public class ActionLogFilter : ActionFilterAttribute
 	{
 		private readonly ILogger _logger;
 
+		/// <summary>Creates a new instance of <see cref="ActionFilterAttribute"/>.</summary>
+		/// <param name="logger"></param>
 		public ActionLogFilter(ILogger logger) => _logger = logger.ForContext<ActionLogFilter>();
 
+		/// <summary>The names of claims to include in the logs. If empty, no claims are included.</summary>
 		public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
 		
+		/// <summary>The names of arguments to exclude from the logs.</summary>
+		public ICollection<string> ExcludeArguments { get; } = new HashSet<string>();
+
+		/// <inheritdoc />
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{
-			var log = _logger.ForContext("Arguments", context.ActionArguments, true);
+			var arguments = context.ActionArguments?.Where(a => !ExcludeArguments.Contains(a.Key, StringComparer.InvariantCultureIgnoreCase));
+			var log = _logger.ForContext("Arguments", arguments, true);
 
 			if (context.Controller is Controller controller && IncludeClaims.Any())
 			{
@@ -30,6 +40,7 @@ namespace Audacia.Log.AspNetCore
 			base.OnActionExecuting(context);
 		}
 
+		/// <inheritdoc />
 		public override void OnActionExecuted(ActionExecutedContext context)
 		{
 			// kinda smells but is there a better way? I think not.

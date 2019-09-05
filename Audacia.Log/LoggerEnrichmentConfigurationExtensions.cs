@@ -6,14 +6,14 @@ namespace Audacia.Log
 	public static class LoggerEnrichmentConfigurationExtensions
 	{
 		/// <summary>Configure loggers to use the default enrichers.</summary>
-		public static LoggerConfiguration WithDefaults(this LoggerEnrichmentConfiguration configuration, LogConfig config)
+		public static LoggerConfiguration WithDefaults(this LoggerEnrichmentConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
 		{
-			return configuration.FromLogContext()
+			return config.FromLogContext()
 				.Enrich.WithAssemblyName()
 				.Enrich.WithAssemblyVersion()
 				.Enrich.WithMachineName()
 				.Enrich.WithEnvironmentUserName()
-				.Enrich.WithProperty("Environment", config.EnvironmentName)
+				.Enrich.WithProperty("Environment", audaciaConfig.EnvironmentName)
 				.Enrich.WithThreadId();
 		}
 	}

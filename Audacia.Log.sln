@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.Log", "Audacia.Log\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.Log.AspNetCore", "Audacia.Log.AspNetCore\Audacia.Log.AspNetCore.csproj", "{4D38A980-41A0-4E9D-B01A-74E214156679}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.Log.AspNet4", "Audacia.Log.AspNet4\Audacia.Log.AspNet4.csproj", "{7E55694A-7FE2-4E88-A0C2-132AF27F31BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{4D38A980-41A0-4E9D-B01A-74E214156679}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D38A980-41A0-4E9D-B01A-74E214156679}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D38A980-41A0-4E9D-B01A-74E214156679}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E55694A-7FE2-4E88-A0C2-132AF27F31BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E55694A-7FE2-4E88-A0C2-132AF27F31BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E55694A-7FE2-4E88-A0C2-132AF27F31BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E55694A-7FE2-4E88-A0C2-132AF27F31BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

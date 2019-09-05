@@ -8,6 +8,7 @@ using Serilog.Events;
 
 namespace Audacia.Log.AspNetCore
 {
+    /// <summary>Middleware for logging the details of each HTTP request and response.</summary>
 	public class HttpLogMiddleware
     {
         private const string RequestingTemplate = "Requesting HTTP {Method} to '{Path}'";
@@ -17,6 +18,7 @@ namespace Audacia.Log.AspNetCore
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
 
+        /// <summary>Creates a new instance of <see cref="HttpLogMiddleware"/>.</summary>
         public HttpLogMiddleware(RequestDelegate next, ILogger logger)
         {
             var requestDelegate = next;
@@ -24,6 +26,8 @@ namespace Audacia.Log.AspNetCore
             _logger = logger?.ForContext<HttpLogMiddleware>() ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>Invokes this middleware.</summary>
+        /// <exception cref="ArgumentNullException">The <param name="httpContext"></param> argument is null.</exception>
         public async Task Invoke(HttpContext httpContext)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));

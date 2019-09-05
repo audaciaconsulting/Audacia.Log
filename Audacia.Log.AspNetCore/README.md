@@ -53,6 +53,6 @@ It can be registered in `Startup.cs` as follows:
 ```c#
 public void Configure(IApplicationBuilder app)
 {
-	app.UseMiddleware<HttpLogMddleware>();
+	app.UseMiddleware<HttpLogMiddleware>();
 }
 ```

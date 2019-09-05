@@ -11,21 +11,21 @@ namespace Audacia.Log
 		internal const string TraceFormat = "[{UserName}] :: {Message}{NewLine:l}{Exception:l}";
 
 		/// <summary>Configure loggers to use the default sinks.</summary>
-		public static LoggerConfiguration Defaults(this LoggerSinkConfiguration configuration, LogConfig config)
+		public static LoggerConfiguration Defaults(this LoggerSinkConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
 		{
-			var loggerConfiguration = configuration
-				.EventLog(config.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
+			var loggerConfiguration = config
+				.EventLog(audaciaConfig.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
 				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
 
-			if (config.IsDevelopment)
+			if (audaciaConfig.IsDevelopment)
 				return loggerConfiguration.WriteTo
 					.ApplicationInsightsTraces(Guid.Empty.ToString(), LogEventLevel.Information);
 
-			if (config.SlackUrl != null)
-				loggerConfiguration = loggerConfiguration.WriteTo.Slack(config.SlackUrl, restrictedToMinimumLevel: LogEventLevel.Error);
+			if (audaciaConfig.SlackUrl != null)
+				loggerConfiguration = loggerConfiguration.WriteTo.Slack(audaciaConfig.SlackUrl, restrictedToMinimumLevel: LogEventLevel.Error);
 
-			if (config.ApplicationInsightsKey != null)
-				loggerConfiguration = loggerConfiguration.WriteTo.ApplicationInsightsTraces(config.ApplicationInsightsKey, LogEventLevel.Information);
+			if (audaciaConfig.ApplicationInsightsKey != null)
+				loggerConfiguration = loggerConfiguration.WriteTo.ApplicationInsightsTraces(audaciaConfig.ApplicationInsightsKey, LogEventLevel.Information);
 
 			return loggerConfiguration;
 
