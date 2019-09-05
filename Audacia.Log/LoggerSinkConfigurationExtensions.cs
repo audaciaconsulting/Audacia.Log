@@ -6,6 +6,7 @@ using Serilog.Sinks.Slack;
 
 namespace Audacia.Log
 {
+	/// <summary>Extension methods for configuring default log sinks.</summary>
 	public static class LoggerSinkConfigurationExtensions
 	{
 		internal const string TraceFormat = "[{UserName}] :: {Message}{NewLine:l}{Exception:l}";

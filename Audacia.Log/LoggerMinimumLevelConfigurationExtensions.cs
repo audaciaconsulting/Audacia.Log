@@ -4,6 +4,7 @@ using Serilog.Events;
 
 namespace Audacia.Log
 {
+	/// <summary>Extension methods for configuring default minimal level filters..</summary>
 	public static class LoggerMinimumLevelConfigurationExtensions
 	{
 		/// <summary>Creates a default logger config with enrichers and sinks.</summary>

@@ -3,6 +3,7 @@ using Serilog.Configuration;
 
 namespace Audacia.Log
 {
+	/// <summary>Extension methods for configuring default log enrichers.</summary>
 	public static class LoggerEnrichmentConfigurationExtensions
 	{
 		/// <summary>Configure loggers to use the default enrichers.</summary>
