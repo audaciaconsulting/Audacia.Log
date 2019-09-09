@@ -13,7 +13,6 @@ namespace Audacia.Log.AspNet4
 			{
 				ApplicationName = ConfigurationManager.AppSettings[$"{prefix}:EnvironmentName"],
 				EnvironmentName = ConfigurationManager.AppSettings[$"{prefix}:EnvironmentName"],
-				IsDevelopment = Bool(ConfigurationManager.AppSettings[$"{prefix}:IsDevelopment"]),
 				ApplicationInsightsKey = ConfigurationManager.AppSettings[$"{prefix}:ApplicationInsightsKey"]
 			};
 			
@@ -21,7 +20,5 @@ namespace Audacia.Log.AspNet4
 				.Enrich.WithRequest()
 				.Enrich.WithResponse();
 		}
-
-		private static bool Bool(string value) => bool.TryParse(value, out var result) && result;
 	}
 }

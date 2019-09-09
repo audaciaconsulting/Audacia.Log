@@ -11,9 +11,6 @@ namespace Audacia.Log
 		/// <example>Development, Quality Assurance, User Acceptance</example>
 		public string EnvironmentName { get; set; }
 
-		/// <summary>Specifies whether this is a development environment and as such, slack and application insights sinks will be explicitly disabled.</summary>
-		public bool IsDevelopment { get; set; }
-
 		/// <summary>The telemetry key for the application insights instance for this environment.</summary>
 		public string ApplicationInsightsKey { get; set; }
 	}

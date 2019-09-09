@@ -17,7 +17,7 @@ namespace Audacia.Log
 				.EventLog(audaciaConfig.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
 				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
 
-			if (audaciaConfig.IsDevelopment || string.IsNullOrWhiteSpace(audaciaConfig.ApplicationInsightsKey))
+			if (string.IsNullOrWhiteSpace(audaciaConfig.ApplicationInsightsKey))
 				return loggerConfiguration.WriteTo
 					.ApplicationInsightsTraces(Guid.Empty.ToString(), LogEventLevel.Information);
 			
