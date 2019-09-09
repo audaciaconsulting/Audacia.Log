@@ -2,6 +2,7 @@ using System;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
+using Serilog.Formatting.Json;
 
 namespace Audacia.Log
 {
@@ -13,9 +14,11 @@ namespace Audacia.Log
 		/// <summary>Configure loggers to use the default sinks.</summary>
 		public static LoggerConfiguration Defaults(this LoggerSinkConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
 		{
+			var jsonFormatter = new JsonFormatter(renderMessage: true);
 			var loggerConfiguration = config
 				.EventLog(audaciaConfig.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
-				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
+				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug)
+				.WriteTo.Async(w => w.RollingFile(jsonFormatter, "logs\\{Date}.log", shared: true));
 
 			if (string.IsNullOrWhiteSpace(audaciaConfig.ApplicationInsightsKey))
 				return loggerConfiguration.WriteTo
