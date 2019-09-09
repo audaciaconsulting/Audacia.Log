@@ -13,7 +13,6 @@ namespace Audacia.Log.AspNetCore
 				ApplicationName = config[$"{section}:ApplicationName"],
 				EnvironmentName = config[$"{section}:EnvironmentName"],
 				IsDevelopment = bool.Parse(config[$"{section}:IsDevelopment"]),
-				SlackUrl = config[$"{section}:SlackUrl"],
 				ApplicationInsightsKey = config[$"{section}:ApplicationInsightsKey"]
 			};
 		}

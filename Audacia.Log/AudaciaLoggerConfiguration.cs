@@ -16,8 +16,5 @@ namespace Audacia.Log
 
 		/// <summary>The telemetry key for the application insights instance for this environment.</summary>
 		public string ApplicationInsightsKey { get; set; }
-
-		/// <summary>A URL to a slack hook to which to send error-level messages to.</summary>
-		public string SlackUrl { get; set; }
 	}
 }

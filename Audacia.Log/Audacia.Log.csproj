@@ -25,7 +25,6 @@
 		<PackageReference Include="Serilog.Enrichers.Thread" Version="3.0.0" />
 		<PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="2.6.0" />
 		<PackageReference Include="Serilog.Sinks.EventLog" Version="3.1.0" />
-		<PackageReference Include="Serilog.Sinks.Slack" Version="1.2.63" />
 		<PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
 	</ItemGroup>
 

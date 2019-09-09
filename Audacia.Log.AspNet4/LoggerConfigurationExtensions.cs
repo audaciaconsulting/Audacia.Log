@@ -14,7 +14,6 @@ namespace Audacia.Log.AspNet4
 				ApplicationName = ConfigurationManager.AppSettings[$"{prefix}:EnvironmentName"],
 				EnvironmentName = ConfigurationManager.AppSettings[$"{prefix}:EnvironmentName"],
 				IsDevelopment = Bool(ConfigurationManager.AppSettings[$"{prefix}:IsDevelopment"]),
-				SlackUrl = ConfigurationManager.AppSettings[$"{prefix}:SlackUrl"],
 				ApplicationInsightsKey = ConfigurationManager.AppSettings[$"{prefix}:ApplicationInsightsKey"]
 			};
 			

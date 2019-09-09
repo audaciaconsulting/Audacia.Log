@@ -2,7 +2,6 @@ using System;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
-using Serilog.Sinks.Slack;
 
 namespace Audacia.Log
 {
@@ -18,15 +17,11 @@ namespace Audacia.Log
 				.EventLog(audaciaConfig.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
 				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
 
-			if (audaciaConfig.IsDevelopment)
+			if (audaciaConfig.IsDevelopment || string.IsNullOrWhiteSpace(audaciaConfig.ApplicationInsightsKey))
 				return loggerConfiguration.WriteTo
 					.ApplicationInsightsTraces(Guid.Empty.ToString(), LogEventLevel.Information);
-
-			if (audaciaConfig.SlackUrl != null)
-				loggerConfiguration = loggerConfiguration.WriteTo.Slack(audaciaConfig.SlackUrl, restrictedToMinimumLevel: LogEventLevel.Error);
-
-			if (audaciaConfig.ApplicationInsightsKey != null)
-				loggerConfiguration = loggerConfiguration.WriteTo.ApplicationInsightsTraces(audaciaConfig.ApplicationInsightsKey, LogEventLevel.Information);
+			
+			loggerConfiguration = loggerConfiguration.WriteTo.ApplicationInsightsTraces(audaciaConfig.ApplicationInsightsKey, LogEventLevel.Information);
 
 			return loggerConfiguration;
 
