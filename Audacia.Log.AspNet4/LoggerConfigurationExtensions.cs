@@ -11,7 +11,7 @@ namespace Audacia.Log.AspNet4
 		{
 			var audaciaConfig = new AudaciaLoggerConfiguration
 			{
-				ApplicationName = ConfigurationManager.AppSettings[$"{prefix}:EnvironmentName"],
+				ApplicationName = ConfigurationManager.AppSettings[$"{prefix}:ApplicationName"],
 				EnvironmentName = ConfigurationManager.AppSettings[$"{prefix}:EnvironmentName"],
 				ApplicationInsightsKey = ConfigurationManager.AppSettings[$"{prefix}:ApplicationInsightsKey"]
 			};
