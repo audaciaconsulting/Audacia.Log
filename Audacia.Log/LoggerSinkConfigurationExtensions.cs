@@ -14,6 +14,9 @@ namespace Audacia.Log
 		/// <summary>Configure loggers to use the default sinks.</summary>
 		public static LoggerConfiguration Defaults(this LoggerSinkConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
 		{
+			if (config == null) throw new ArgumentNullException(nameof(config));
+			if (audaciaConfig == null) throw new ArgumentNullException(nameof(audaciaConfig));
+
 			var jsonFormatter = new JsonFormatter(renderMessage: true);
 			var loggerConfiguration = config
 				.EventLog(audaciaConfig.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
@@ -21,13 +24,14 @@ namespace Audacia.Log
 				.WriteTo.Async(w => w.RollingFile(jsonFormatter, "logs\\{Date}.log", shared: true));
 
 			if (string.IsNullOrWhiteSpace(audaciaConfig.ApplicationInsightsKey))
-				return loggerConfiguration.WriteTo
+            {
+                return loggerConfiguration.WriteTo
 					.ApplicationInsightsTraces(Guid.Empty.ToString(), LogEventLevel.Information);
-			
+            }
+
 			loggerConfiguration = loggerConfiguration.WriteTo.ApplicationInsightsTraces(audaciaConfig.ApplicationInsightsKey, LogEventLevel.Information);
 
 			return loggerConfiguration;
-
 		}
 	}
 }

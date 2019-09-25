@@ -11,7 +11,7 @@ namespace Audacia.Log.AspNetCore
 		public static LoggerConfiguration ConfigureDefaults(this LoggerConfiguration loggerConfig, string section = "Logging")
 		{
 			var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-		
+
 			var configuration = new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
 				.AddJsonFile($"appsettings.{envName}.json", false)
@@ -21,4 +21,4 @@ namespace Audacia.Log.AspNetCore
 			return loggerConfig.ConfigureDefaults(config);
 		}
 	}
-}	
+}

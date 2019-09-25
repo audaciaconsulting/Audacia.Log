@@ -14,11 +14,10 @@ namespace Audacia.Log.AspNetCore
         private const string RequestingTemplate = "Requesting HTTP {Method} to '{Path}'";
         private const string RespondingTemplate = "Responding HTTP {Method} to '{Path}' with {StatusCode} in {Elapsed:0.0000} ms";
 
-
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
 
-        /// <summary>Creates a new instance of <see cref="HttpLogMiddleware"/>.</summary>
+        /// <summary>Initializes a new instance of the <see cref="HttpLogMiddleware"/> class.Creates a new instance of <see cref="HttpLogMiddleware"/>.</summary>
         public HttpLogMiddleware(RequestDelegate next, ILogger logger)
         {
             var requestDelegate = next;
@@ -27,7 +26,7 @@ namespace Audacia.Log.AspNetCore
         }
 
         /// <summary>Invokes this middleware.</summary>
-        /// <exception cref="ArgumentNullException">The <param name="httpContext"></param> argument is null.</exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="httpContext"></paramref> argument is null.</exception>
         public async Task Invoke(HttpContext httpContext)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
@@ -65,14 +64,13 @@ namespace Audacia.Log.AspNetCore
                     .ForContext("Request", request, true)
                     .ForContext("Connection", connection, true);
 
-
                 requestLog.Write(LogEventLevel.Information, RequestingTemplate, httpContext.Request.Method, httpContext.Request.Path);
 
-                await _next(httpContext);
+                await _next(httpContext).ConfigureAwait(false);
 
                 var statusCode = httpContext.Response?.StatusCode ?? 0;
                 var level = statusCode > 499 ? LogEventLevel.Error
-                    : statusCode > 366 ? LogEventLevel.Warning 
+                    : statusCode > 366 ? LogEventLevel.Warning
                     : LogEventLevel.Information;
 
                 var response = httpContext.Response == null ? null : new
@@ -84,7 +82,8 @@ namespace Audacia.Log.AspNetCore
 
                 var responseLog = requestLog.ForContext("Response", response, true);
 
-                responseLog.Write(level,
+                responseLog.Write(
+                    level,
                     RespondingTemplate,
                     httpContext.Request.Method,
                     httpContext.Request.Path,
@@ -93,7 +92,9 @@ namespace Audacia.Log.AspNetCore
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, RespondingTemplate,
+                _logger.Error(
+                    ex,
+                    RespondingTemplate,
                     httpContext.Request.Method,
                     httpContext.Request.Path,
                     500,

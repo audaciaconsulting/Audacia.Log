@@ -8,6 +8,7 @@
     <Copyright>Copyright © Audacia 2019</Copyright>
     <PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
     <PackageVersion>0.1.0</PackageVersion>
+    <CodeAnalysisRuleSet>../CodeAnalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -20,6 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Audacia.CodeAnalysis" Version="0.0.47183.19267" />
     <PackageReference Include="Microsoft.ApplicationInsights.DependencyCollector" Version="2.10.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.PerfCounterCollector" Version="2.10.0" />
     <PackageReference Include="Serilog.Enrichers.HttpContextInfo" Version="1.0.0" />
