@@ -14,14 +14,18 @@ namespace Audacia.Log.AspNetCore
 		{
 			if (services == null) throw new ArgumentNullException(nameof(services));
 			if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-			if (logger == null) throw new ArgumentNullException(nameof(logger));
 
 			TelemetryConfiguration.Active.InstrumentationKey = configuration.ApplicationInsightsKey;
+			var options = new Microsoft.ApplicationInsights.AspNetCore.Extensions.ApplicationInsightsServiceOptions
+			{
+				EnableAdaptiveSampling = false,
+				InstrumentationKey = configuration.ApplicationInsightsKey,
+			};
 
 			return services
 				.AddSingleton(logger ?? Serilog.Log.Logger)
 				.AddLogging(l => l.AddSerilog())
-				.AddApplicationInsightsTelemetry(configuration.ApplicationInsightsKey);
+				.AddApplicationInsightsTelemetry(options);
 		}
 
 		/// <summary>Configures logging for an ASP.NET Core application using settings specified in appSettings.json file.</summary>
@@ -29,19 +33,24 @@ namespace Audacia.Log.AspNetCore
 		{
 			var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-			var configuration = new ConfigurationBuilder()
+			var webConfig = new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
 				.AddJsonFile($"appsettings.{envName}.json", true)
 				.Build();
 
-			var config = configuration.LogConfig(section);
+			var logConfig = webConfig.LogConfig(section);
 
-			TelemetryConfiguration.Active.InstrumentationKey = config.ApplicationInsightsKey;
+			TelemetryConfiguration.Active.InstrumentationKey = logConfig.ApplicationInsightsKey;
+			var options = new Microsoft.ApplicationInsights.AspNetCore.Extensions.ApplicationInsightsServiceOptions
+			{
+				EnableAdaptiveSampling = false,
+				InstrumentationKey = logConfig.ApplicationInsightsKey,
+			};
 
 			return services
 				.AddSingleton(logger ?? Serilog.Log.Logger)
 				.AddLogging(l => l.AddSerilog())
-				.AddApplicationInsightsTelemetry(config.ApplicationInsightsKey);
+				.AddApplicationInsightsTelemetry(options);
 		}
 	}
 }
