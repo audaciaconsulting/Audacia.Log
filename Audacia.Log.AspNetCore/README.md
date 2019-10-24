@@ -28,7 +28,8 @@ public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
 		.UseStartup<Startup>();
 ```
 
-There is a similar extension method provided for configuring the logging service in your `Startup.cs`. Similarly, a `LogConfig` can be passed to this method if you don't want to specify settings in your configuration file:
+There is a similar extension method provided for configuring the logging service in your `Startup.cs`. Similarly, a `LogConfig` can be passed to this method if you don't want to specify settings in your configuration file.a
+It is recommended to call this method first in the chain so any subsequent errors that may occur are logged correctly.
 
 ```c#
 public void ConfigureServices(IServiceCollection services)
