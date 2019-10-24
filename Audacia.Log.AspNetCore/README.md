@@ -12,9 +12,7 @@ Settings can also be specified programatically using the `LogConfig` type, howev
 "Logging": {
 	"ApplicationName": "ExampleApp",
 	"EnvironmentName": "User Acceptance",
-	"IsDevelopment": false,
 	"ApplicationInsightsKey": "00000000-0000-0000-0000-000000000000",
-	"SlackUrl": "[Slack Webhook]"
 },
 ```
 
@@ -44,7 +42,7 @@ public void ConfigureServices(IServiceCollection services)
 This filter can be registered to include logs for the beginning and end of each Action Method. The request parameters are included, as well as details of the response such as the type of model returned. Register it like so:
 
 ```c#
-serviceCollection.AddMvcCore(x => x.Filters.Add<ActionLogFilter>())
+serviceCollection.AddMvcCore(x => x.Filters.Add<ActionLogFilterAttribute>())
 ```
 
 #### HttpLogMiddleware
