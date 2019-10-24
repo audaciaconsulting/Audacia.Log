@@ -13,5 +13,8 @@ namespace Audacia.Log
 
 		/// <summary>The telemetry key for the application insights instance for this environment.</summary>
 		public string ApplicationInsightsKey { get; set; }
+
+		/// <summary>Enable adaptive sampling for application insights telemetry. By default this is turned off.</summary>
+		public bool EnableSampling { get; set; }
 	}
 }

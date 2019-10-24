@@ -18,7 +18,7 @@ namespace Audacia.Log.AspNetCore
 			TelemetryConfiguration.Active.InstrumentationKey = configuration.ApplicationInsightsKey;
 			var options = new Microsoft.ApplicationInsights.AspNetCore.Extensions.ApplicationInsightsServiceOptions
 			{
-				EnableAdaptiveSampling = false,
+				EnableAdaptiveSampling = configuration.EnableSampling,
 				InstrumentationKey = configuration.ApplicationInsightsKey,
 			};
 
