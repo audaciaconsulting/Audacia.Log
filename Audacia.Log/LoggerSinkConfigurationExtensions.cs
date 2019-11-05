@@ -2,7 +2,6 @@ using System;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
-using Serilog.Formatting.Json;
 
 namespace Audacia.Log
 {
@@ -17,11 +16,9 @@ namespace Audacia.Log
 			if (config == null) throw new ArgumentNullException(nameof(config));
 			if (audaciaConfig == null) throw new ArgumentNullException(nameof(audaciaConfig));
 
-			var jsonFormatter = new JsonFormatter(renderMessage: true);
 			var loggerConfiguration = config
 				.EventLog(audaciaConfig.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
-				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug)
-				.WriteTo.Async(w => w.RollingFile(jsonFormatter, "logs\\{Date}.log", shared: true));
+				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
 
 			if (string.IsNullOrWhiteSpace(audaciaConfig.ApplicationInsightsKey))
             {
