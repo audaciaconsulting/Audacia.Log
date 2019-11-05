@@ -1,10 +1,7 @@
 using System;
-using System.IO;
-using System.Reflection;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
-using Serilog.Formatting.Json;
 
 namespace Audacia.Log
 {
