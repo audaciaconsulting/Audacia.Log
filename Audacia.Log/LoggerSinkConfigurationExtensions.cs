@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Reflection;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
@@ -11,6 +13,8 @@ namespace Audacia.Log
 	{
 		internal const string TraceFormat = "[{UserName}] :: {Message}{NewLine:l}{Exception:l}";
 
+		private static readonly string LogFilePath = Path.Combine(Assembly.GetExecutingAssembly().Location, "logs", "{Date}.log");
+
 		/// <summary>Configure loggers to use the default sinks.</summary>
 		public static LoggerConfiguration Defaults(this LoggerSinkConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
 		{
@@ -21,7 +25,7 @@ namespace Audacia.Log
 			var loggerConfiguration = config
 				.EventLog(audaciaConfig.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
 				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug)
-				.WriteTo.Async(w => w.RollingFile(jsonFormatter, "logs\\{Date}.log", shared: true));
+				.WriteTo.Async(w => w.RollingFile(jsonFormatter, LogFilePath, shared: true));
 
 			if (string.IsNullOrWhiteSpace(audaciaConfig.ApplicationInsightsKey))
             {
