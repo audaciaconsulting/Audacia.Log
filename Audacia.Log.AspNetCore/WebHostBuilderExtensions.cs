@@ -20,11 +20,11 @@ namespace Audacia.Log.AspNetCore
 			var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 			var configuration = new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
-				.AddJsonFile($"appsettings.{envName}.json")
+				.AddJsonFile($"appsettings.{envName}.json", true)
 				.Build();
-			
+
 			var config = configuration.LogConfig(section);
-			
+
 			return builder.UseSerilog()
 				.UseApplicationInsights(config.ApplicationInsightsKey);
 		}
