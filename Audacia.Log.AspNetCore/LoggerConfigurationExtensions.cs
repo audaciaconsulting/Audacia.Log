@@ -14,7 +14,7 @@ namespace Audacia.Log.AspNetCore
 
 			var configuration = new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json")
-				.AddJsonFile($"appsettings.{envName}.json", false)
+				.AddJsonFile($"appsettings.{envName}.json", true)
 				.Build();
 
 			var config = configuration.LogConfig(section);
