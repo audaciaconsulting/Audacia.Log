@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
@@ -17,8 +18,13 @@ namespace Audacia.Log
 			if (audaciaConfig == null) throw new ArgumentNullException(nameof(audaciaConfig));
 
 			var loggerConfiguration = config
-				.EventLog(audaciaConfig.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning)
-				.WriteTo.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
+				.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                loggerConfiguration = loggerConfiguration.WriteTo
+                    .EventLog(audaciaConfig.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning);
+            }
 
 			if (string.IsNullOrWhiteSpace(audaciaConfig.ApplicationInsightsKey))
             {
