@@ -5,7 +5,7 @@
 		<Description>Standardized SeriLog logging configuration for Audacia Web APIs.</Description>
 		<Copyright>Copyright © Audacia 2019</Copyright>
 		<PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
-		<PackageVersion>0.1.0</PackageVersion>
+		<PackageVersion>1.0.0</PackageVersion>
 		<CodeAnalysisRuleSet>../CodeAnalysis.ruleset</CodeAnalysisRuleSet>
 	</PropertyGroup>
 
