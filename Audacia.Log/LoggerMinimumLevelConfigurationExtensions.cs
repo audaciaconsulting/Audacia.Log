@@ -9,15 +9,19 @@ namespace Audacia.Log
 	public static class LoggerMinimumLevelConfigurationExtensions
 	{
 		/// <summary>Creates a default logger config with enrichers and sinks.</summary>
+		/// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
 		public static LoggerConfiguration Defaults(this LoggerMinimumLevelConfiguration configuration)
 		{
-			if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+			if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
 
 			return configuration
 				.Verbose()
 				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-				.MinimumLevel.Override("IdentityServer4", LogEventLevel.Warning)
-				.MinimumLevel.Override("IdentityServer4.Validation.TokenValidator", LogEventLevel.Fatal);
+				.MinimumLevel.Override("IdentityServer4", LogEventLevel.Information)
+				.MinimumLevel.Override("IdentityServer4.Validation.TokenValidator", LogEventLevel.Warning);
 		}
 	}
 }

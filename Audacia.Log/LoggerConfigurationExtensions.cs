@@ -8,12 +8,19 @@ namespace Audacia.Log
 	public static class LoggerConfigurationExtensions
 	{
 		/// <summary>Creates a default logger config with enrichers and sinks.</summary>
+		/// <exception cref="ArgumentNullException"><paramref name="config"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="audaciaConfig"/> is <see langword="null"/>.</exception>
 		public static LoggerConfiguration ConfigureDefaults(this LoggerConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
 		{
-			if (config == null) throw new ArgumentNullException(nameof(config));
-			if (audaciaConfig == null) throw new ArgumentNullException(nameof(audaciaConfig));
+			if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
 
-			TelemetryConfiguration.Active.InstrumentationKey = audaciaConfig.ApplicationInsightsKey;
+			if (audaciaConfig == null)
+            {
+                throw new ArgumentNullException(nameof(audaciaConfig));
+            }
 
 			return config
 				.MinimumLevel.Defaults()

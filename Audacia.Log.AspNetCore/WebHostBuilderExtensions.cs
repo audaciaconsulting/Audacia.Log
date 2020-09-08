@@ -9,28 +9,29 @@ namespace Audacia.Log.AspNetCore
 	public static class WebHostBuilderExtensions
 	{
 		/// <summary>Reads the log configuration from the application's appsettings.json.</summary>
+		/// <exception cref="ArgumentNullException"><paramref name="builder"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
 		public static IWebHostBuilder ConfigureLogging(this IWebHostBuilder builder, AudaciaLoggerConfiguration configuration)
 		{
-			if (builder == null) throw new ArgumentNullException(nameof(builder));
-			if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+			if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
 
-			return builder.UseSerilog()
-				.UseApplicationInsights(configuration.ApplicationInsightsKey);
+			if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+			return builder.UseSerilog();
 		}
 
-		/// <summary>Reads the log configuration from the application's appsettings.json.</summary>
+        /// <summary>Reads the log configuration from the application's appsettings.json.</summary>
+#pragma warning disable CA1801 // Review unused parameters - publicly shipped API
 		public static IWebHostBuilder ConfigureLogging(this IWebHostBuilder builder, string section = "Logging")
-		{
-			var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-			var configuration = new ConfigurationBuilder()
-				.AddJsonFile("appsettings.json")
-				.AddJsonFile($"appsettings.{envName}.json", true)
-				.Build();
-
-			var config = configuration.LogConfig(section);
-
-			return builder.UseSerilog()
-				.UseApplicationInsights(config.ApplicationInsightsKey);
+#pragma warning restore CA1801 // Review unused parameters
+        {
+			return builder.UseSerilog();
 		}
 	}
 }

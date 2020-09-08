@@ -7,10 +7,19 @@ namespace Audacia.Log.AspNetCore
 	public static class ConfigurationExtensions
 	{
 		/// <summary>Reads the log configuration from the application's appSettings.json.</summary>
+		/// <exception cref="ArgumentNullException"><paramref name="config"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="section"/> is <see langword="null"/>.</exception>
 		public static AudaciaLoggerConfiguration LogConfig(this IConfiguration config, string section = "Logging")
 		{
-			if (config == null) throw new ArgumentNullException(nameof(config));
-			if (section == null) throw new ArgumentNullException(nameof(section));
+			if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+			if (section == null)
+            {
+                throw new ArgumentNullException(nameof(section));
+            }
 
 			return new AudaciaLoggerConfiguration
 			{
