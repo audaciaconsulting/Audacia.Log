@@ -7,56 +7,56 @@ using Serilog;
 
 namespace Audacia.Log.AspNetCore
 {
-	/// <summary>Logs requests and responses for each Controller Action.</summary>
-	public sealed class ActionLogFilterAttribute : ActionFilterAttribute
-	{
-		/// <summary>Gets the logger used by this filter for writing logs.</summary>
-		public ILogger Logger { get; }
+    /// <summary>Logs requests and responses for each Controller Action.</summary>
+    public sealed class ActionLogFilterAttribute : ActionFilterAttribute
+    {
+        /// <summary>Gets the logger used by this filter for writing logs.</summary>
+        public ILogger Logger { get; }
 
         /// <summary>Initializes a new instance of the <see cref="ActionLogFilterAttribute"/> class.Creates a new instance of <see cref="ActionFilterAttribute"/>.</summary>
 		public ActionLogFilterAttribute(ILogger logger)
         {
-	        if (logger == null)
+            if (logger == null)
             {
                 throw new ArgumentNullException(nameof(logger));
             }
 
-	        Logger = logger.ForContext<ActionLogFilterAttribute>();
+            Logger = logger.ForContext<ActionLogFilterAttribute>();
         }
 
         /// <summary>Gets the names of claims to include in the logs. If empty, no claims are included.</summary>
 		public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
 
-		/// <summary>Gets the names of arguments to exclude from the logs.</summary>
-		public ICollection<string> ExcludeArguments { get; } = new HashSet<string>();
+        /// <summary>Gets the names of arguments to exclude from the logs.</summary>
+        public ICollection<string> ExcludeArguments { get; } = new HashSet<string>();
 
-		/// <inheritdoc />
-		public override void OnActionExecuting(ActionExecutingContext context)
-		{
-			if (context == null)
+        /// <inheritdoc />
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-			var arguments = context.ActionArguments?.Where(a => !ExcludeArguments.Contains(a.Key, StringComparer.InvariantCultureIgnoreCase));
-			var log = Logger.ForContext("Arguments", arguments, true);
+            var arguments = context.ActionArguments?.Where(a => !ExcludeArguments.Contains(a.Key, StringComparer.InvariantCultureIgnoreCase));
+            var log = Logger.ForContext("Arguments", arguments, true);
 
-			if (context.Controller is Controller controller && IncludeClaims.Any())
-			{
-				var claims = controller.User?.Claims?.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
+            if (context.Controller is Controller controller && IncludeClaims.Any())
+            {
+                var claims = controller.User?.Claims?.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
 
-				if (claims?.Any() == true)
+                if (claims?.Any() == true)
                 {
                     log = log.ForContext("Claims", claims, true);
                 }
             }
 
-			log.Information("Action Executing: {Action}.", context.ActionDescriptor.DisplayName);
-			base.OnActionExecuting(context);
-		}
+            log.Information("Action Executing: {Action}.", context.ActionDescriptor.DisplayName);
+            base.OnActionExecuting(context);
+        }
 
-		/// <inheritdoc />
-		public override void OnActionExecuted(ActionExecutedContext context)
+        /// <inheritdoc />
+        public override void OnActionExecuted(ActionExecutedContext context)
         {
             if (context == null)
             {
