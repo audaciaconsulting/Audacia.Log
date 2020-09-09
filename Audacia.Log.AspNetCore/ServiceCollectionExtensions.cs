@@ -28,18 +28,18 @@ namespace Audacia.Log.AspNetCore
                 .AddSingleton(logger ?? Serilog.Log.Logger)
                 .AddLogging(l => l.AddSerilog());
 
-            if (configuration.IsApplicationInsightsKeySet())
+            if (string.IsNullOrWhiteSpace(configuration.ApplicationInsightsKey))
             {
-                var options = new ApplicationInsightsServiceOptions
-                {
-                    EnableAdaptiveSampling = configuration.EnableSampling,
-                    InstrumentationKey = configuration.ApplicationInsightsKey
-                };
-
-                services = services.AddApplicationInsightsTelemetry(options);
+                configuration.ApplicationInsightsKey = Guid.Empty.ToString();
             }
 
-            return services;
+            var options = new ApplicationInsightsServiceOptions
+            {
+                EnableAdaptiveSampling = configuration.EnableSampling,
+                InstrumentationKey = configuration.ApplicationInsightsKey
+            };
+
+            return services.AddApplicationInsightsTelemetry(options);
         }
 
         /// <summary>Configures logging for an ASP.NET Core application using settings specified in appSettings.json file.</summary>
