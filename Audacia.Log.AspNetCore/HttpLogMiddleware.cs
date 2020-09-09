@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
 using Microsoft.AspNetCore.Http;
 using Serilog;
 using Serilog.Events;
@@ -27,9 +28,13 @@ namespace Audacia.Log.AspNetCore
 
         /// <summary>Invokes this middleware.</summary>
         /// <exception cref="ArgumentNullException">The <paramref name="httpContext"></paramref> argument is null.</exception>
-        public async Task Invoke(HttpContext httpContext)
+        [MaxMethodLength(15)]
+        public async Task InvokeAsync(HttpContext httpContext)
         {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
+            if (httpContext == null)
+            {
+                throw new ArgumentNullException(nameof(httpContext));
+            }
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -90,10 +95,10 @@ namespace Audacia.Log.AspNetCore
                     statusCode,
                     stopwatch.Elapsed.TotalMilliseconds);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
                 _logger.Error(
-                    ex,
+                    exception,
                     RespondingTemplate,
                     httpContext.Request.Method,
                     httpContext.Request.Path,

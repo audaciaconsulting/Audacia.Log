@@ -6,35 +6,46 @@ using Serilog.Events;
 
 namespace Audacia.Log
 {
-	/// <summary>Extension methods for configuring default log sinks.</summary>
-	public static class LoggerSinkConfigurationExtensions
-	{
-		internal const string TraceFormat = "[{UserName}] :: {Message}{NewLine:l}{Exception:l}";
+    /// <summary>Extension methods for configuring default log sinks.</summary>
+    public static class LoggerSinkConfigurationExtensions
+    {
+        internal const string TraceFormat = "[{UserName}] :: {Message}{NewLine:l}{Exception:l}";
 
-		/// <summary>Configure loggers to use the default sinks.</summary>
+        /// <summary>Configure loggers to use the default sinks.</summary>
+        /// <exception cref="ArgumentNullException"><paramref name="audaciaConfig"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="config"/> is <see langword="null"/>.</exception>
 		public static LoggerConfiguration Defaults(this LoggerSinkConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
-		{
-			if (config == null) throw new ArgumentNullException(nameof(config));
-			if (audaciaConfig == null) throw new ArgumentNullException(nameof(audaciaConfig));
+        {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
 
-			var loggerConfiguration = config
-				.Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
-            
+            if (audaciaConfig == null)
+            {
+                throw new ArgumentNullException(nameof(audaciaConfig));
+            }
+
+            var loggerConfiguration = config
+                .Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
+
+#if DEBUG
+            loggerConfiguration = loggerConfiguration.WriteTo.Console();
+#endif
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 loggerConfiguration = loggerConfiguration.WriteTo
                     .EventLog(audaciaConfig.ApplicationName, restrictedToMinimumLevel: LogEventLevel.Warning);
             }
 
-			if (string.IsNullOrWhiteSpace(audaciaConfig.ApplicationInsightsKey))
+            if (audaciaConfig.IsApplicationInsightsKeySet())
             {
-                return loggerConfiguration.WriteTo
-					.ApplicationInsightsTraces(Guid.Empty.ToString(), LogEventLevel.Information);
+                loggerConfiguration = loggerConfiguration.WriteTo
+                    .ApplicationInsights(TelemetryConverter.Traces);
             }
 
-			loggerConfiguration = loggerConfiguration.WriteTo.ApplicationInsightsTraces(audaciaConfig.ApplicationInsightsKey, LogEventLevel.Information);
-
-			return loggerConfiguration;
-		}
-	}
+            return loggerConfiguration;
+        }
+    }
 }

@@ -8,7 +8,7 @@
     <Copyright>Copyright © Audacia 2019</Copyright>
     <PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
     <PackageVersion>0.1.0</PackageVersion>
-    <CodeAnalysisRuleSet>../CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -17,14 +17,14 @@
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DocumentationFile>bin\Release\Audacia.Log.AspNet4.xml</DocumentationFile>
-    <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Audacia.CodeAnalysis" Version="0.0.47183.19267">
+    <PackageReference Include="Audacia.CodeAnalysis" Version="1.0.20251.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Audacia.CodeAnalysis.Analyzers.Helpers" Version="1.0.20216.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.DependencyCollector" Version="2.11.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.PerfCounterCollector" Version="2.11.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.Web" Version="2.11.2" />
