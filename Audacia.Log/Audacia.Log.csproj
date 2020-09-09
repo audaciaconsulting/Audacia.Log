@@ -1,38 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<Description>Standardized SeriLog logging configuration for Audacia projects.</Description>
-		<Copyright>Copyright © Audacia 2019</Copyright>
-		<PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
-		<PackageVersion>1.0.0</PackageVersion>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Standardized SeriLog logging configuration for Audacia projects.</Description>
+    <Copyright>Copyright © Audacia 2019</Copyright>
+    <PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
+    <PackageIcon>audacia-logo-circle-blue.png</PackageIcon>
+    <PackageVersion>1.0.0</PackageVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-	</PropertyGroup>
+  </PropertyGroup>
 
-	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-	  <DocumentationFile>bin\Release\Audacia.Log.xml</DocumentationFile>
-	  <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
-	</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DocumentationFile>bin\Release\Audacia.Log.xml</DocumentationFile>
+    <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
+  </PropertyGroup>
 
-	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-	  <DocumentationFile>bin\Debug\Audacia.Log.xml</DocumentationFile>
-	</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DocumentationFile>bin\Debug\Audacia.Log.xml</DocumentationFile>
+  </PropertyGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="Audacia.CodeAnalysis" Version="1.0.20251.2">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	  <PackageReference Include="Audacia.CodeAnalysis.Analyzers.Helpers" Version="1.0.20216.1" />
-	  <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" />
-	  <PackageReference Include="Serilog" Version="2.9.0" />
-		<PackageReference Include="Serilog.Enrichers.AssemblyName" Version="1.0.9" />
-		<PackageReference Include="Serilog.Enrichers.Environment" Version="2.1.3" />
-		<PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
-		<PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="3.1.0" />
-		<PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-		<PackageReference Include="Serilog.Sinks.EventLog" Version="3.1.0" />
-		<PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Audacia.CodeAnalysis" Version="1.0.20251.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Audacia.CodeAnalysis.Analyzers.Helpers" Version="1.0.20216.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Serilog" Version="2.9.0" />
+    <PackageReference Include="Serilog.Enrichers.AssemblyName" Version="1.0.9" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.1.3" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="3.1.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.EventLog" Version="3.1.0" />
+    <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="audacia-logo-circle-blue.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

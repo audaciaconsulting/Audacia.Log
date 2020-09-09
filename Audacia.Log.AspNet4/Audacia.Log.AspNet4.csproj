@@ -7,6 +7,7 @@
     <Company>Audacia</Company>
     <Copyright>Copyright © Audacia 2019</Copyright>
     <PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
+    <PackageIcon>audacia-logo-circle-blue.png</PackageIcon>
     <PackageVersion>0.1.0</PackageVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -34,6 +35,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Audacia.Log\Audacia.Log.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="audacia-logo-circle-blue.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
