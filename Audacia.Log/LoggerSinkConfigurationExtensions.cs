@@ -27,11 +27,8 @@ namespace Audacia.Log
             }
 
             var loggerConfiguration = config
-                .Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug);
-
-#if DEBUG
-            loggerConfiguration = loggerConfiguration.WriteTo.Console();
-#endif
+                .Trace(outputTemplate: TraceFormat, restrictedToMinimumLevel: LogEventLevel.Debug)
+                .WriteTo.Console();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
