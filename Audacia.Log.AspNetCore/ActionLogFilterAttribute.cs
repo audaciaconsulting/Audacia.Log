@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
@@ -38,8 +39,15 @@ namespace Audacia.Log.AspNetCore
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var arguments = context.ActionArguments
-                ?.Where(argument => !argument.Key.ContainsStringCaseInsensitive(ExcludeArguments));
+            // For each Action Argument;
+            // - Key is the parameter name from the controller action.
+            // - Value is the parameter object from the controller action.
+            // We need to recursively search the Value for parameter names that should be redacted.
+            var arguments = new Dictionary<string, object>();
+            foreach (var argument in context.ActionArguments)
+            {
+                IncludeData(argument.Key, argument.Value, arguments);
+            }
 
             var log = Logger.ForContext("Arguments", arguments, true);
 
@@ -90,6 +98,46 @@ namespace Audacia.Log.AspNetCore
             }
 
             return returnLog;
+        }
+
+#pragma warning disable ACL1002 // Function too long - really though?
+        private void IncludeData(string name, object data, IDictionary<string, object> parent)
+#pragma warning restore ACL1002
+        {
+            // Skip logging of null data
+            // Redact arguments with keys containing excluded words
+            if (data == null || name.ContainsStringCaseInsensitive(ExcludeArguments))
+            {
+                return;
+            }
+
+            // Iterate through classes and structs to remove parameters with redacted words in the name
+            var dataType = data.GetType();
+            var isClass = dataType.IsClass && !(data is string);
+            var isStruct = dataType.IsValueType && !dataType.IsPrimitive && !dataType.IsEnum;
+            if (isClass || isStruct)
+            {
+                // Get the public property names
+                var properties = dataType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                var objectData = new Dictionary<string, object>();
+
+                // Append safe values to classData
+                foreach (var propertyInfo in properties)
+                {
+                    IncludeData(propertyInfo.Name, propertyInfo.GetValue(data), objectData);
+                }
+
+                // Append classData to the parent object's dictionary
+                if (objectData.Count > 0)
+                {
+                    parent.Add(name, objectData);
+                }
+
+                return;
+            }
+
+            // Include parameter name and value on the parent object's dictionary
+            parent.Add(name, data);
         }
 
         private static void LogFinish(object result, string resultType, string actionName, ILogger log)
