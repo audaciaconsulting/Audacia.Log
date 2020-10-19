@@ -39,17 +39,7 @@ namespace Audacia.Log.AspNetCore
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // For each Action Argument;
-            // - Key is the parameter name from the controller action.
-            // - Value is the parameter object from the controller action.
-            // We need to recursively search the Value for parameter names that should be redacted.
-            var arguments = new Dictionary<string, object>();
-            foreach (var argument in context.ActionArguments)
-            {
-                IncludeData(argument.Key, argument.Value, arguments);
-            }
-
-            var log = Logger.ForContext("Arguments", arguments, true);
+            var log = LogArguments(Logger, context);
 
             if (context.Controller is Controller controller && IncludeClaims.Any())
             {
@@ -85,6 +75,23 @@ namespace Audacia.Log.AspNetCore
             base.OnActionExecuted(context);
         }
 
+        /// <summary>
+        /// Recursively search the Value for parameter names that should be redacted.
+        /// </summary>
+        private ILogger LogArguments(ILogger log, ActionExecutingContext context)
+        {
+            // For each Action Argument;
+            // - Key is the parameter name from the controller action.
+            // - Value is the parameter object from the controller action.
+            var arguments = new Dictionary<string, object>();
+            foreach (var argument in context.ActionArguments)
+            {
+                IncludeData(argument.Key, argument.Value, arguments);
+            }
+
+            return log.ForContext("Arguments", arguments, true);
+        }
+
         private ILogger LogClaims(ILogger log, Controller controller)
         {
             var claims = controller.User?.Claims?
@@ -100,44 +107,64 @@ namespace Audacia.Log.AspNetCore
             return returnLog;
         }
 
-#pragma warning disable ACL1002 // Function too long - really though?
         private void IncludeData(string name, object data, IDictionary<string, object> parent)
-#pragma warning restore ACL1002
         {
             // Skip logging of null data
-            // Redact arguments with keys containing excluded words
+            // Redact when parameter names contain excluded words
             if (data == null || name.ContainsStringCaseInsensitive(ExcludeArguments))
             {
                 return;
             }
 
-            // Iterate through classes and structs to remove parameters with redacted words in the name
-            var dataType = data.GetType();
-            var isClass = dataType.IsClass && !(data is string);
-            var isStruct = dataType.IsValueType && !dataType.IsPrimitive && !dataType.IsEnum;
-            if (isClass || isStruct)
+            // Filter insecure nested parameters from classes / structs
+            if (data.IsClass() || data.IsStruct())
             {
-                // Get the public property names
-                var properties = dataType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                var objectData = new Dictionary<string, object>();
-
-                // Append safe values to classData
-                foreach (var propertyInfo in properties)
-                {
-                    IncludeData(propertyInfo.Name, propertyInfo.GetValue(data), objectData);
-                }
-
-                // Append classData to the parent object's dictionary
-                if (objectData.Count > 0)
-                {
-                    parent.Add(name, objectData);
-                }
-
+                IncludeObject(name, data, parent);
                 return;
+            }
+
+            // Filter insecure keys from dictionaries
+            if (data is IDictionary<string, object> dictionary)
+            {
+                IncludeDictionary(name, dictionary, parent);
             }
 
             // Include parameter name and value on the parent object's dictionary
             parent.Add(name, data);
+        }
+
+        private void IncludeDictionary(string name, IDictionary<string, object> data, IDictionary<string, object> parent)
+        {
+            var objectData = new Dictionary<string, object>();
+            foreach (var entry in data)
+            {
+                IncludeData(entry.Key, entry.Value, objectData);
+            }
+
+            // Append data to the parent object's dictionary
+            if (objectData.Count > 0)
+            {
+                parent.Add(name, objectData);
+            }
+        }
+
+        private void IncludeObject(string name, object data, IDictionary<string, object> parent)
+        {
+            // Get the public property names
+            var properties = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var objectData = new Dictionary<string, object>();
+
+            // Append safe values to objectData
+            foreach (var propertyInfo in properties)
+            {
+                IncludeData(propertyInfo.Name, propertyInfo.GetValue(data), objectData);
+            }
+
+            // Append objectData to the parent object's dictionary
+            if (objectData.Count > 0)
+            {
+                parent.Add(name, objectData);
+            }
         }
 
         private static void LogFinish(object result, string resultType, string actionName, ILogger log)
