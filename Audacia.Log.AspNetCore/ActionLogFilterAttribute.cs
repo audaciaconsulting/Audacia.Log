@@ -45,12 +45,7 @@ namespace Audacia.Log.AspNetCore
 
             if (context.Controller is Controller controller && IncludeClaims.Any())
             {
-                var claims = controller.User?.Claims?.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
-
-                if (claims?.Any() == true)
-                {
-                    log = log.ForContext("Claims", claims, true);
-                }
+                log = LogClaims(log, controller);
             }
 
             log.Information("Action Executing: {Action}.", context.ActionDescriptor.DisplayName);
@@ -84,7 +79,9 @@ namespace Audacia.Log.AspNetCore
 
         private ILogger LogClaims(ILogger log, Controller controller)
         {
-            var claims = controller.User?.Claims?.Where(c => IncludeClaims.Contains(c.Subject.Name)).Select(c => c.Subject.Name + ": " + c.Value);
+            var claims = controller.User?.Claims?
+                .Where(claim => IncludeClaims.Contains(claim.Subject.Name))
+                .Select(claim => claim.Subject.Name + ": " + claim.Value);
 
             var returnLog = log;
             if (claims?.Any() == true)
