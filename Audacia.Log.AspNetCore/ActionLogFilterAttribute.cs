@@ -38,7 +38,9 @@ namespace Audacia.Log.AspNetCore
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var arguments = context.ActionArguments?.Where(a => !ExcludeArguments.Contains(a.Key, StringComparer.InvariantCultureIgnoreCase));
+            var arguments = context.ActionArguments
+                ?.Where(argument => !argument.Key.ContainsStringCaseInsensitive(ExcludeArguments));
+
             var log = Logger.ForContext("Arguments", arguments, true);
 
             if (context.Controller is Controller controller && IncludeClaims.Any())
