@@ -26,8 +26,9 @@ namespace Audacia.Log.AspNetCore
                 typeof(IReadOnlyDictionary<,>),
             };
             var dataType = data.GetType();
-            var dataTypeDefinition = dataType.GetGenericTypeDefinition();
-            return dataType.IsGenericType && dictionaryInterfaces.Any(dictionaryType => dictionaryType.IsAssignableFrom(dataTypeDefinition));
+            return dataType.IsGenericType &&
+                   dictionaryInterfaces.Any(dictionaryType => dictionaryType
+                       .IsAssignableFrom(dataType.GetGenericTypeDefinition()));
         }
 
         /// <summary>
