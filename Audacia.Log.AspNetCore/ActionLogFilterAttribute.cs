@@ -14,7 +14,7 @@ namespace Audacia.Log.AspNetCore
         public ILogger Logger { get; }
 
         /// <summary>Initializes a new instance of the <see cref="ActionLogFilterAttribute"/> class.Creates a new instance of <see cref="ActionFilterAttribute"/>.</summary>
-		public ActionLogFilterAttribute(ILogger logger)
+        public ActionLogFilterAttribute(ILogger logger)
         {
             if (logger == null)
             {
@@ -25,7 +25,7 @@ namespace Audacia.Log.AspNetCore
         }
 
         /// <summary>Gets the names of claims to include in the logs. If empty, no claims are included.</summary>
-		public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
+        public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
 
         /// <summary>Gets the names of arguments to exclude from the logs.</summary>
         public ICollection<string> ExcludeArguments { get; } = new HashSet<string>();

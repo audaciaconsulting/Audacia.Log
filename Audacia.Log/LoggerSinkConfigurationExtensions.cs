@@ -14,7 +14,7 @@ namespace Audacia.Log
         /// <summary>Configure loggers to use the default sinks.</summary>
         /// <exception cref="ArgumentNullException"><paramref name="audaciaConfig"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="config"/> is <see langword="null"/>.</exception>
-		public static LoggerConfiguration Defaults(this LoggerSinkConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
+        public static LoggerConfiguration Defaults(this LoggerSinkConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
         {
             if (config == null)
             {
