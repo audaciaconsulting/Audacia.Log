@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -124,21 +125,23 @@ namespace Audacia.Log.AspNetCore
             }
 
             // Filter insecure keys from dictionaries
-            if (data is IDictionary<string, object> dictionary)
+            if (data.IsDictionary())
             {
-                IncludeDictionary(name, dictionary, parent);
+                IncludeDictionary(name, data as IEnumerable, parent);
             }
 
             // Include parameter name and value on the parent object's dictionary
             parent.Add(name, data);
         }
 
-        private void IncludeDictionary(string name, IDictionary<string, object> data, IDictionary<string, object> parent)
+        private void IncludeDictionary(string name, IEnumerable data, IDictionary<string, object> parent)
         {
             var objectData = new Dictionary<string, object>();
             foreach (var entry in data)
             {
-                IncludeData(entry.Key, entry.Value, objectData);
+                var key = entry.GetDictionaryKey();
+                var value = entry.GetDictionaryValue();
+                IncludeData(key, value, objectData);
             }
 
             // Append data to the parent object's dictionary
