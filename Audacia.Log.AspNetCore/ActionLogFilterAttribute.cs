@@ -59,8 +59,7 @@ namespace Audacia.Log.AspNetCore
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // kinda smells but is there a better way? I think not.
-            var result = context.Result?.GetType().GetProperty("Value")?.GetValue(context.Result);
+            var result = context.Result?.GetValue();
             var resultType = result?.GetType().Name;
             var actionName = context.ActionDescriptor.DisplayName;
 
