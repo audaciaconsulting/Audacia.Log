@@ -40,12 +40,18 @@ namespace Audacia.Log.AspNetCore
             return type.IsValueType && !type.IsPrimitive && !type.IsEnum;
         }
 
+        /// <summary>
+        /// Gets the Key from any generic dictionary item.
+        /// </summary>
         public static string GetDictionaryKey(this object item)
         {
             var method = typeof(KeyValuePair<,>).GetProperty("Key").GetGetMethod();
             return method.Invoke(item, null).ToString();
         }
 
+        /// <summary>
+        /// Gets the Value from any generic dictionary item.
+        /// </summary>
         public static object GetDictionaryValue(this object item)
         {
             var method = typeof(KeyValuePair<,>).GetProperty("Value").GetGetMethod();
