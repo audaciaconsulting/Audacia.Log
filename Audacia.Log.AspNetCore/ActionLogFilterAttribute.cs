@@ -194,6 +194,7 @@ namespace Audacia.Log.AspNetCore
             if (data.IsDictionary())
             {
                 IncludeDictionary(name, data as IEnumerable, parent);
+                return;
             }
 
             // Include parameter name and value on the parent object's dictionary
