@@ -42,7 +42,44 @@ public void ConfigureServices(IServiceCollection services)
 This filter can be registered to include logs for the beginning and end of each Action Method. The request parameters are included, as well as details of the response such as the type of model returned. Register it like so:
 
 ```c#
-serviceCollection.AddMvcCore(x => x.Filters.Add<ActionLogFilterAttribute>())
+serviceCollection.AddMvcCore(x => x.Filters.Add<ActionLogFilterAttribute>());
+```
+##### Configure global request filtering
+To globally configure the logging of actions you must register a `ActionLogFilterConfig` for dependency injection.
+This will allow the redaction of specific parameters from the request body during action logs.
+This is case insensitive and will filter out parameters that contain the provided words.
+For example using "Password" as the value will filter; Password, password, NewPassword, ConfirmPassword, etc.
+```c#
+serviceCollection.AddSingleton(_ => new ActionLogFilterConfig
+{
+    ExcludeArguments = new[] { "password", "token" }
+});
+```
+
+##### Filtering specific requests
+To filter specific requests the `LogFilterAttribute` can be used. 
+To prevent the body content of the web request from being recorded use the `DisableBodyContent` parameter.
+```c#
+using Audacia.Log.AspNetCore;
+...
+[LogFilter(DisableBodyContent = true)]
+public IActionRequest SetPassword(...)
+{
+    ...
+}
+```
+
+If only a specific parameter needs to be excluded then that can also be done via the `ExcludeArguments` parameter. 
+This is case insensitive and will filter out parameters that contain the provided words.
+For example using "Password" as the value will filter; Password, password, NewPassword, ConfirmPassword, etc.
+```c#
+using Audacia.Log.AspNetCore;
+...
+[LogFilter(ExcludeArguments = new[] { "password" })]
+public IActionRequest SalesforceLogin(string username, string password)
+{
+    ...
+}
 ```
 
 #### HttpLogMiddleware
