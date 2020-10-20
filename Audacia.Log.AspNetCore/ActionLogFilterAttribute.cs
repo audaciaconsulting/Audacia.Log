@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace Audacia.Log.AspNetCore
@@ -16,13 +17,17 @@ namespace Audacia.Log.AspNetCore
         public ILogger Logger { get; }
 
         /// <summary>Initializes a new instance of the <see cref="ActionLogFilterAttribute"/> class.Creates a new instance of <see cref="ActionFilterAttribute"/>.</summary>
-        public ActionLogFilterAttribute(ILogger logger)
+        public ActionLogFilterAttribute(IServiceProvider provider)
         {
-            if (logger == null)
+            if (provider == null)
             {
-                throw new ArgumentNullException(nameof(logger));
+                throw new ArgumentNullException(nameof(provider));
             }
 
+            var logger = provider.GetRequiredService<ILogger>();
+            var globalConfig = provider.GetService<ActionLogFilterConfig>();
+
+            Configure(globalConfig);
             Logger = logger.ForContext<ActionLogFilterAttribute>();
         }
 
@@ -30,7 +35,11 @@ namespace Audacia.Log.AspNetCore
         public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
 
         /// <summary>Gets the names of arguments to exclude from the logs.</summary>
-        public ICollection<string> ExcludeArguments { get; } = new HashSet<string>();
+        public ICollection<string> ExcludeArguments { get; } = new HashSet<string>
+        {
+            "password",
+            "token"
+        };
 
         /// <summary>
         /// Gets or sets a value indicating whether the logging of all data in the request body is disabled.
@@ -45,7 +54,8 @@ namespace Audacia.Log.AspNetCore
                 throw new ArgumentNullException(nameof(context));
             }
 
-            ConfigurePerRequest(context);
+            var actionConfig = GetControllerActionConfiguration(context);
+            Configure(actionConfig);
 
             var log = LogArguments(Logger, context);
 
@@ -82,36 +92,49 @@ namespace Audacia.Log.AspNetCore
             base.OnActionExecuted(context);
         }
 
-        private void ConfigurePerRequest(ActionExecutingContext context)
+        /// <summary>
+        /// Applies configuration to the log filter if provided.
+        /// </summary>
+        /// <param name="config">global or action config.</param>
+        private void Configure(ActionLogFilterConfig config)
         {
-            // Get attribute for per request configuration
-            var logFilterAttribute = context.ActionDescriptor.FilterDescriptors
-                .Select(descriptor => descriptor.Filter)
-                .OfType<LogFilterAttribute>()
-                .FirstOrDefault();
-
-            if (logFilterAttribute == null)
+            if (config == null)
             {
                 return;
             }
 
-            DisableBodyContent = logFilterAttribute.DisableBodyContent;
+            DisableBodyContent = config.DisableBodyContent;
 
-            if (logFilterAttribute.ExcludeArguments?.Length > 0)
+            if (config.ExcludeArguments?.Length > 0)
             {
-                foreach (var item in logFilterAttribute.ExcludeArguments)
+                foreach (var item in config.ExcludeArguments)
                 {
                     ExcludeArguments.Add(item);
                 }
             }
 
-            if (logFilterAttribute.IncludeClaims?.Length > 0)
+            if (config.IncludeClaims?.Length > 0)
             {
-                foreach (var item in logFilterAttribute.IncludeClaims)
+                foreach (var item in config.IncludeClaims)
                 {
                     IncludeClaims.Add(item);
                 }
             }
+        }
+
+        private ActionLogFilterConfig GetControllerActionConfiguration(ActionExecutingContext context)
+        {
+            // Get attribute for per request configuration
+            return context.ActionDescriptor.FilterDescriptors
+                .Select(descriptor => descriptor.Filter)
+                .OfType<LogFilterAttribute>()
+                .Select(attribute => new ActionLogFilterConfig
+                {
+                    DisableBodyContent = attribute.DisableBodyContent,
+                    ExcludeArguments = attribute.ExcludeArguments,
+                    IncludeClaims = attribute.IncludeClaims
+                })
+                .FirstOrDefault();
         }
 
         /// <summary>
