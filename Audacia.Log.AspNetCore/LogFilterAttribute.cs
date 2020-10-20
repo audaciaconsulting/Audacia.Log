@@ -12,7 +12,7 @@ namespace Audacia.Log.AspNetCore
     /// [LogFilter(ExcludeArguments = new[] { "password" })]
     /// [LogFilter(IncludeClaims = new[] { "user.search" })]
     /// </example>
-    public class LogFilterAttribute : Attribute, IFilterMetadata
+    public sealed class LogFilterAttribute : Attribute, IFilterMetadata
     {
         /// <summary>
         /// Gets or sets the names of arguments to exclude from the logs.
