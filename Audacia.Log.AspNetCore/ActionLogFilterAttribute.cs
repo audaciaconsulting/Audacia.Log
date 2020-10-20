@@ -109,6 +109,11 @@ namespace Audacia.Log.AspNetCore
             {
                 foreach (var item in config.ExcludeArguments)
                 {
+                    if (ExcludeArguments.Contains(item, StringComparer.InvariantCultureIgnoreCase))
+                    {
+                        continue;
+                    }
+
                     ExcludeArguments.Add(item);
                 }
             }
@@ -117,6 +122,11 @@ namespace Audacia.Log.AspNetCore
             {
                 foreach (var item in config.IncludeClaims)
                 {
+                    if (IncludeClaims.Contains(item, StringComparer.InvariantCultureIgnoreCase))
+                    {
+                        continue;
+                    }
+
                     IncludeClaims.Add(item);
                 }
             }
