@@ -32,6 +32,11 @@ namespace Audacia.Log.AspNetCore
         /// <summary>Gets the names of arguments to exclude from the logs.</summary>
         public ICollection<string> ExcludeArguments { get; } = new HashSet<string>();
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the logging of all data in the request body is disabled.
+        /// </summary>
+        public bool DisableBodyContent { get; set; }
+
         /// <inheritdoc />
         public override void OnActionExecuting(ActionExecutingContext context)
         {
@@ -39,6 +44,8 @@ namespace Audacia.Log.AspNetCore
             {
                 throw new ArgumentNullException(nameof(context));
             }
+
+            ConfigurePerRequest(context);
 
             var log = LogArguments(Logger, context);
 
@@ -75,11 +82,48 @@ namespace Audacia.Log.AspNetCore
             base.OnActionExecuted(context);
         }
 
+        private void ConfigurePerRequest(ActionExecutingContext context)
+        {
+            // Get attribute for per request configuration
+            var logFilterAttribute = context.ActionDescriptor.FilterDescriptors
+                .Select(descriptor => descriptor.Filter)
+                .OfType<LogFilterAttribute>()
+                .FirstOrDefault();
+
+            if (logFilterAttribute == null)
+            {
+                return;
+            }
+
+            DisableBodyContent = logFilterAttribute.DisableBodyContent;
+
+            if (logFilterAttribute.ExcludeArguments?.Length > 0)
+            {
+                foreach (var item in logFilterAttribute.ExcludeArguments)
+                {
+                    ExcludeArguments.Add(item);
+                }
+            }
+
+            if (logFilterAttribute.IncludeClaims?.Length > 0)
+            {
+                foreach (var item in logFilterAttribute.IncludeClaims)
+                {
+                    IncludeClaims.Add(item);
+                }
+            }
+        }
+
         /// <summary>
         /// Recursively search the Value for parameter names that should be redacted.
         /// </summary>
         private ILogger LogArguments(ILogger log, ActionExecutingContext context)
         {
+            if (DisableBodyContent)
+            {
+                return log;
+            }
+
             // For each Action Argument;
             // - Key is the parameter name from the controller action.
             // - Value is the parameter object from the controller action.
