@@ -194,7 +194,7 @@ namespace Audacia.Log.AspNetCore
             }
 
             // Filter insecure nested parameters from classes / structs
-            if (data.IsClass() || data.IsStruct())
+            if (data.IsClass() || data.IsNonDisplayableStruct())
             {
                 IncludeObject(name, data, parent);
                 return;
