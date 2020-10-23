@@ -188,7 +188,9 @@ namespace Audacia.Log.AspNetCore
             return returnLog;
         }
 
+#pragma warning disable ACL1002 // Member or local function contains too many statements
         private void IncludeData(string name, object data, IDictionary<string, object> parent)
+#pragma warning restore ACL1002 // Member or local function contains too many statements
         {
             // Skip logging of null data
             // Redact when parameter names contain excluded words
@@ -197,17 +199,26 @@ namespace Audacia.Log.AspNetCore
                 return;
             }
 
-            // Filter insecure nested parameters from classes / structs
-            if (data.IsClass() || data.IsNonDisplayableStruct())
+            var type = data.GetType();
+
+            // Filter insecure keys from dictionaries
+            if (type.IsDictionary())
             {
-                IncludeObject(name, data, parent);
+                IncludeDictionary(name, data as IEnumerable, parent);
                 return;
             }
 
-            // Filter insecure keys from dictionaries
-            if (data.IsDictionary())
+            // Filter insecure objects from lists
+            if (type.IsList())
             {
-                IncludeDictionary(name, data as IEnumerable, parent);
+                IncludeList(name, data as IEnumerable, parent);
+                return;
+            }
+
+            // Filter insecure nested parameters from classes / structs
+            if (type.IsClassObject() || type.IsNonDisplayableStruct(data))
+            {
+                IncludeObject(name, data, parent);
                 return;
             }
 
@@ -229,6 +240,25 @@ namespace Audacia.Log.AspNetCore
             if (objectData.Count > 0)
             {
                 parent.Add(name, objectData);
+            }
+        }
+
+        private void IncludeList(string name, IEnumerable data, IDictionary<string, object> parent)
+        {
+            var objectData = new Dictionary<string, object>();
+
+            var index = 0;
+            var enumerator = data.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                IncludeData($"{index}", enumerator.Current, objectData);
+                index++;
+            }
+
+            // Append data to the parent object's dictionary
+            if (objectData.Count > 0)
+            {
+                parent.Add(name, objectData.Values);
             }
         }
 
