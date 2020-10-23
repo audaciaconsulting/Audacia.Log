@@ -218,7 +218,7 @@ namespace Audacia.Log.AspNetCore
             // Filter insecure nested parameters from classes / structs
             if (type.IsClassObject() || type.IsNonDisplayableStruct(data))
             {
-                IncludeObject(name, data, parent);
+                IncludeObject(name, data, type, parent);
                 return;
             }
 
@@ -262,19 +262,19 @@ namespace Audacia.Log.AspNetCore
             }
         }
 
-        private void IncludeObject(string name, object data, IDictionary<string, object> parent)
+        private void IncludeObject(string name, object data, Type type, IDictionary<string, object> parent)
         {
             var objectData = new Dictionary<string, object>();
 
             // Append safe fields to objectData
-            var fields = data.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
             foreach (var fieldInfo in fields)
             {
                 IncludeData(fieldInfo.Name, fieldInfo.GetValue(data), objectData);
             }
 
             // Append safe properties to objectData
-            var properties = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var propertyInfo in properties)
             {
                 IncludeData(propertyInfo.Name, propertyInfo.GetValue(data), objectData);
