@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Audacia.Log.AspNetCore
 {
@@ -23,7 +24,7 @@ namespace Audacia.Log.AspNetCore
             {
                 typeof(IDictionary<,>),
                 typeof(IDictionary),
-                typeof(IReadOnlyDictionary<,>),
+                typeof(IReadOnlyDictionary<,>)
             };
             var dataType = data.GetType();
             return dataType.IsGenericType &&
@@ -53,7 +54,11 @@ namespace Audacia.Log.AspNetCore
         /// </summary>
         public static string GetDictionaryKey(this object item)
         {
-            var method = typeof(KeyValuePair<,>).GetProperty("Key").GetGetMethod();
+            var method = typeof(KeyValuePair<,>)
+#pragma warning disable REFL016 // Use nameof.
+                .GetProperty("Key", BindingFlags.Public | BindingFlags.Instance)
+#pragma warning restore REFL016 // Use nameof.
+                .GetGetMethod();
             return method.Invoke(item, null).ToString();
         }
 
@@ -62,7 +67,11 @@ namespace Audacia.Log.AspNetCore
         /// </summary>
         public static object GetDictionaryValue(this object item)
         {
-            var method = typeof(KeyValuePair<,>).GetProperty("Value").GetGetMethod();
+            var method = typeof(KeyValuePair<,>)
+#pragma warning disable REFL016 // Use nameof.
+                .GetProperty("Value", BindingFlags.Public | BindingFlags.Instance)
+#pragma warning restore REFL016 // Use nameof.
+                .GetGetMethod();
             return method.Invoke(item, null);
         }
     }

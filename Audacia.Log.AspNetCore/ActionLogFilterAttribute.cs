@@ -17,7 +17,9 @@ namespace Audacia.Log.AspNetCore
         public ILogger Logger { get; }
 
         /// <summary>Initializes a new instance of the <see cref="ActionLogFilterAttribute"/> class.Creates a new instance of <see cref="ActionFilterAttribute"/>.</summary>
+#pragma warning disable CA1019 // Define accessors for attribute arguments
         public ActionLogFilterAttribute(IServiceProvider provider)
+#pragma warning restore CA1019 // Define accessors for attribute arguments
         {
             if (provider == null)
             {
@@ -96,7 +98,9 @@ namespace Audacia.Log.AspNetCore
         /// Applies configuration to the log filter if provided.
         /// </summary>
         /// <param name="config">global or action config.</param>
+#pragma warning disable ACL1002 // Member or local function contains too many statements
         private void Configure(ActionLogFilterConfig config)
+#pragma warning restore ACL1002 // Member or local function contains too many statements
         {
             if (config == null)
             {
@@ -132,7 +136,7 @@ namespace Audacia.Log.AspNetCore
             }
         }
 
-        private ActionLogFilterConfig GetControllerActionConfiguration(ActionExecutingContext context)
+        private static ActionLogFilterConfig GetControllerActionConfiguration(ActionExecutingContext context)
         {
             // Get attribute for per request configuration
             return context.ActionDescriptor.FilterDescriptors
