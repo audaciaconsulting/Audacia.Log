@@ -17,7 +17,9 @@ namespace Audacia.Log.AspNetCore
         public ILogger Logger { get; }
 
         /// <summary>Initializes a new instance of the <see cref="ActionLogFilterAttribute"/> class.Creates a new instance of <see cref="ActionFilterAttribute"/>.</summary>
+#pragma warning disable CA1019 // Define accessors for attribute arguments
         public ActionLogFilterAttribute(IServiceProvider provider)
+#pragma warning restore CA1019 // Define accessors for attribute arguments
         {
             if (provider == null)
             {
@@ -37,9 +39,17 @@ namespace Audacia.Log.AspNetCore
         /// <summary>Gets the names of arguments to exclude from the logs.</summary>
         public ICollection<string> ExcludeArguments { get; } = new HashSet<string>
         {
+            "username",
             "password",
-            "token"
+            "email",
+            "token",
+            "bearer"
         };
+
+        /// <summary>
+        /// Gets or sets the max depth for desconstructing objects in the request body.
+        /// </summary>
+        public int MaxDepth { get; set; } = 32;
 
         /// <summary>
         /// Gets or sets a value indicating whether the logging of all data in the request body is disabled.
@@ -96,7 +106,9 @@ namespace Audacia.Log.AspNetCore
         /// Applies configuration to the log filter if provided.
         /// </summary>
         /// <param name="config">global or action config.</param>
+#pragma warning disable ACL1002 // Member or local function contains too many statements
         private void Configure(ActionLogFilterConfig config)
+#pragma warning restore ACL1002 // Member or local function contains too many statements
         {
             if (config == null)
             {
@@ -104,6 +116,11 @@ namespace Audacia.Log.AspNetCore
             }
 
             DisableBodyContent = config.DisableBodyContent;
+
+            if (config.MaxDepth > 0)
+            {
+                MaxDepth = config.MaxDepth;
+            }
 
             if (config.ExcludeArguments?.Length > 0)
             {
@@ -132,7 +149,7 @@ namespace Audacia.Log.AspNetCore
             }
         }
 
-        private ActionLogFilterConfig GetControllerActionConfiguration(ActionExecutingContext context)
+        private static ActionLogFilterConfig GetControllerActionConfiguration(ActionExecutingContext context)
         {
             // Get attribute for per request configuration
             return context.ActionDescriptor.FilterDescriptors
@@ -142,7 +159,8 @@ namespace Audacia.Log.AspNetCore
                 {
                     DisableBodyContent = attribute.DisableBodyContent,
                     ExcludeArguments = attribute.ExcludeArguments,
-                    IncludeClaims = attribute.IncludeClaims
+                    IncludeClaims = attribute.IncludeClaims,
+                    MaxDepth = attribute.MaxDepth
                 })
                 .FirstOrDefault();
         }
@@ -163,7 +181,7 @@ namespace Audacia.Log.AspNetCore
             var arguments = new Dictionary<string, object>();
             foreach (var argument in context.ActionArguments)
             {
-                IncludeData(argument.Key, argument.Value, arguments);
+                IncludeData(argument.Key, argument.Value, 0, arguments);
             }
 
             return log.ForContext("Arguments", arguments, true);
@@ -184,26 +202,39 @@ namespace Audacia.Log.AspNetCore
             return returnLog;
         }
 
-        private void IncludeData(string name, object data, IDictionary<string, object> parent)
+#pragma warning disable ACL1002 // Member or local function contains too many statements
+        private void IncludeData(string name, object data, int depth, IDictionary<string, object> parent)
+#pragma warning restore ACL1002 // Member or local function contains too many statements
         {
             // Skip logging of null data
             // Redact when parameter names contain excluded words
-            if (data == null || name.ContainsStringCaseInsensitive(ExcludeArguments))
+            if (depth >= MaxDepth ||
+                data == null ||
+                name.ContainsStringCaseInsensitive(ExcludeArguments))
             {
+                return;
+            }
+
+            var type = data.GetType();
+
+            // Filter insecure keys from dictionaries
+            if (type.IsDictionary())
+            {
+                IncludeDictionary(name, data as IEnumerable, depth, parent);
+                return;
+            }
+
+            // Filter insecure objects from lists
+            if (type.IsList())
+            {
+                IncludeList(name, data as IEnumerable, depth, parent);
                 return;
             }
 
             // Filter insecure nested parameters from classes / structs
-            if (data.IsClass() || data.IsStruct())
+            if (type.IsClassObject() || type.IsNonDisplayableStruct(data))
             {
-                IncludeObject(name, data, parent);
-                return;
-            }
-
-            // Filter insecure keys from dictionaries
-            if (data.IsDictionary())
-            {
-                IncludeDictionary(name, data as IEnumerable, parent);
+                IncludeObject(name, data, type, depth, parent);
                 return;
             }
 
@@ -211,14 +242,14 @@ namespace Audacia.Log.AspNetCore
             parent.Add(name, data);
         }
 
-        private void IncludeDictionary(string name, IEnumerable data, IDictionary<string, object> parent)
+        private void IncludeDictionary(string name, IEnumerable data, int depth, IDictionary<string, object> parent)
         {
             var objectData = new Dictionary<string, object>();
             foreach (var entry in data)
             {
                 var key = entry.GetDictionaryKey();
                 var value = entry.GetDictionaryValue();
-                IncludeData(key, value, objectData);
+                IncludeData(key, value, (depth + 1), objectData);
             }
 
             // Append data to the parent object's dictionary
@@ -228,16 +259,43 @@ namespace Audacia.Log.AspNetCore
             }
         }
 
-        private void IncludeObject(string name, object data, IDictionary<string, object> parent)
+        private void IncludeList(string name, IEnumerable data, int depth, IDictionary<string, object> parent)
         {
-            // Get the public property names
-            var properties = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             var objectData = new Dictionary<string, object>();
 
-            // Append safe values to objectData
+            var index = 0;
+            var enumerator = data.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                IncludeData($"{index}", enumerator.Current, (depth + 1), objectData);
+                index++;
+            }
+
+            // Append data to the parent object's dictionary
+            if (objectData.Count > 0)
+            {
+                parent.Add(name, objectData.Values);
+            }
+        }
+
+#pragma warning disable ACL1003 // Signature contains too many parameters
+        private void IncludeObject(string name, object data, Type type, int depth, IDictionary<string, object> parent)
+#pragma warning restore ACL1003 // Signature contains too many parameters
+        {
+            var objectData = new Dictionary<string, object>();
+
+            // Append safe fields to objectData
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var fieldInfo in fields)
+            {
+                IncludeData(fieldInfo.Name, fieldInfo.GetValue(data), (depth + 1), objectData);
+            }
+
+            // Append safe properties to objectData
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var propertyInfo in properties)
             {
-                IncludeData(propertyInfo.Name, propertyInfo.GetValue(data), objectData);
+                IncludeData(propertyInfo.Name, propertyInfo.GetValue(data), (depth + 1), objectData);
             }
 
             // Append objectData to the parent object's dictionary
