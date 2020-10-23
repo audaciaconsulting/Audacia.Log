@@ -39,9 +39,17 @@ namespace Audacia.Log.AspNetCore
         /// <summary>Gets the names of arguments to exclude from the logs.</summary>
         public ICollection<string> ExcludeArguments { get; } = new HashSet<string>
         {
+            "username",
             "password",
-            "token"
+            "email",
+            "token",
+            "bearer"
         };
+
+        /// <summary>
+        /// Gets or sets the max depth for desconstructing objects in the request body.
+        /// </summary>
+        public int MaxDepth { get; set; } = 32;
 
         /// <summary>
         /// Gets or sets a value indicating whether the logging of all data in the request body is disabled.
@@ -109,6 +117,11 @@ namespace Audacia.Log.AspNetCore
 
             DisableBodyContent = config.DisableBodyContent;
 
+            if (config.MaxDepth > 0)
+            {
+                MaxDepth = config.MaxDepth;
+            }
+
             if (config.ExcludeArguments?.Length > 0)
             {
                 foreach (var item in config.ExcludeArguments)
@@ -146,7 +159,8 @@ namespace Audacia.Log.AspNetCore
                 {
                     DisableBodyContent = attribute.DisableBodyContent,
                     ExcludeArguments = attribute.ExcludeArguments,
-                    IncludeClaims = attribute.IncludeClaims
+                    IncludeClaims = attribute.IncludeClaims,
+                    MaxDepth = attribute.MaxDepth
                 })
                 .FirstOrDefault();
         }
@@ -167,7 +181,7 @@ namespace Audacia.Log.AspNetCore
             var arguments = new Dictionary<string, object>();
             foreach (var argument in context.ActionArguments)
             {
-                IncludeData(argument.Key, argument.Value, arguments);
+                IncludeData(argument.Key, argument.Value, 0, arguments);
             }
 
             return log.ForContext("Arguments", arguments, true);
@@ -189,12 +203,14 @@ namespace Audacia.Log.AspNetCore
         }
 
 #pragma warning disable ACL1002 // Member or local function contains too many statements
-        private void IncludeData(string name, object data, IDictionary<string, object> parent)
+        private void IncludeData(string name, object data, int depth, IDictionary<string, object> parent)
 #pragma warning restore ACL1002 // Member or local function contains too many statements
         {
             // Skip logging of null data
             // Redact when parameter names contain excluded words
-            if (data == null || name.ContainsStringCaseInsensitive(ExcludeArguments))
+            if (depth >= MaxDepth ||
+                data == null ||
+                name.ContainsStringCaseInsensitive(ExcludeArguments))
             {
                 return;
             }
@@ -204,21 +220,21 @@ namespace Audacia.Log.AspNetCore
             // Filter insecure keys from dictionaries
             if (type.IsDictionary())
             {
-                IncludeDictionary(name, data as IEnumerable, parent);
+                IncludeDictionary(name, data as IEnumerable, depth, parent);
                 return;
             }
 
             // Filter insecure objects from lists
             if (type.IsList())
             {
-                IncludeList(name, data as IEnumerable, parent);
+                IncludeList(name, data as IEnumerable, depth, parent);
                 return;
             }
 
             // Filter insecure nested parameters from classes / structs
             if (type.IsClassObject() || type.IsNonDisplayableStruct(data))
             {
-                IncludeObject(name, data, type, parent);
+                IncludeObject(name, data, type, depth, parent);
                 return;
             }
 
@@ -226,14 +242,14 @@ namespace Audacia.Log.AspNetCore
             parent.Add(name, data);
         }
 
-        private void IncludeDictionary(string name, IEnumerable data, IDictionary<string, object> parent)
+        private void IncludeDictionary(string name, IEnumerable data, int depth, IDictionary<string, object> parent)
         {
             var objectData = new Dictionary<string, object>();
             foreach (var entry in data)
             {
                 var key = entry.GetDictionaryKey();
                 var value = entry.GetDictionaryValue();
-                IncludeData(key, value, objectData);
+                IncludeData(key, value, (depth + 1), objectData);
             }
 
             // Append data to the parent object's dictionary
@@ -243,7 +259,7 @@ namespace Audacia.Log.AspNetCore
             }
         }
 
-        private void IncludeList(string name, IEnumerable data, IDictionary<string, object> parent)
+        private void IncludeList(string name, IEnumerable data, int depth, IDictionary<string, object> parent)
         {
             var objectData = new Dictionary<string, object>();
 
@@ -251,7 +267,7 @@ namespace Audacia.Log.AspNetCore
             var enumerator = data.GetEnumerator();
             while (enumerator.MoveNext())
             {
-                IncludeData($"{index}", enumerator.Current, objectData);
+                IncludeData($"{index}", enumerator.Current, (depth + 1), objectData);
                 index++;
             }
 
@@ -262,7 +278,7 @@ namespace Audacia.Log.AspNetCore
             }
         }
 
-        private void IncludeObject(string name, object data, Type type, IDictionary<string, object> parent)
+        private void IncludeObject(string name, object data, Type type, int depth, IDictionary<string, object> parent)
         {
             var objectData = new Dictionary<string, object>();
 
@@ -270,14 +286,14 @@ namespace Audacia.Log.AspNetCore
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
             foreach (var fieldInfo in fields)
             {
-                IncludeData(fieldInfo.Name, fieldInfo.GetValue(data), objectData);
+                IncludeData(fieldInfo.Name, fieldInfo.GetValue(data), (depth + 1), objectData);
             }
 
             // Append safe properties to objectData
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var propertyInfo in properties)
             {
-                IncludeData(propertyInfo.Name, propertyInfo.GetValue(data), objectData);
+                IncludeData(propertyInfo.Name, propertyInfo.GetValue(data), (depth + 1), objectData);
             }
 
             // Append objectData to the parent object's dictionary

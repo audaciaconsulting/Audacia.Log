@@ -28,5 +28,10 @@ namespace Audacia.Log.AspNetCore
         /// Gets or sets a value indicating whether the request body data should be logged.
         /// </summary>
         public bool DisableBodyContent { get; set; }
+
+        /// <summary>
+        /// Gets or sets the max depth for desconstructing objects in the request body.
+        /// </summary>
+        public int MaxDepth { get; set; }
     }
 }

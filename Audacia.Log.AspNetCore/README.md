@@ -82,6 +82,16 @@ public IActionRequest SalesforceLogin(string username, string password)
 }
 ```
 
+To limit the depth of the request that is logged you may use the `MaxDepth` parameter.
+This is intended to prevent attacks on APIs that allow for dynamic request depths.
+The default MaxDepth is 32.
+```c#
+using Audacia.Log.AspNetCore;
+...
+[LogFilter(MaxDepth = 3)]
+...
+```
+
 #### HttpLogMiddleware
 This middleware can be used to log every HTTP request and response, with details of each included in the log context. **Its not recommended to use this with Application Insights because Application Insights has its own HTTP logging**.
 It can be registered in `Startup.cs` as follows:
