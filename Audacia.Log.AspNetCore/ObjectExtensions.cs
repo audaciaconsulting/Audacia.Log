@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Reflection;
 
 namespace Audacia.Log.AspNetCore
@@ -12,10 +10,16 @@ namespace Audacia.Log.AspNetCore
         /// </summary>
         public static string GetDictionaryKey(this object item)
         {
-            var method = typeof(KeyValuePair<,>)
-#pragma warning disable REFL016 // Use nameof.
+            var type = item.GetType();
+            if (!type.IsKeyValuePair())
+            {
+                throw new InvalidCastException($"{type.FullName} is not a KeyValuePair.");
+            }
+
+            var method = type
+#pragma warning disable REFL009 // The referenced member is not known to exist.
                 .GetProperty("Key", BindingFlags.Public | BindingFlags.Instance)
-#pragma warning restore REFL016 // Use nameof.
+#pragma warning restore REFL009 // The referenced member is not known to exist.
                 .GetGetMethod();
             return method.Invoke(item, null).ToString();
         }
@@ -25,10 +29,16 @@ namespace Audacia.Log.AspNetCore
         /// </summary>
         public static object GetDictionaryValue(this object item)
         {
-            var method = typeof(KeyValuePair<,>)
-#pragma warning disable REFL016 // Use nameof.
+            var type = item.GetType();
+            if (!type.IsKeyValuePair())
+            {
+                throw new InvalidCastException($"{type.FullName} is not a KeyValuePair.");
+            }
+
+            var method = type
+#pragma warning disable REFL009 // The referenced member is not known to exist.
                 .GetProperty("Value", BindingFlags.Public | BindingFlags.Instance)
-#pragma warning restore REFL016 // Use nameof.
+#pragma warning restore REFL009 // The referenced member is not known to exist.
                 .GetGetMethod();
             return method.Invoke(item, null);
         }

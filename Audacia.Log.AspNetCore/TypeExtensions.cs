@@ -36,6 +36,16 @@ namespace Audacia.Log.AspNetCore
         }
 
         /// <summary>
+        /// Returns true if the object is a KeyValuePair.
+        /// </summary>
+        public static bool IsKeyValuePair(this Type type)
+        {
+            return type.IsGenericType &&
+                type.GetGenericTypeDefinition()
+                    .IsAssignableFrom(typeof(KeyValuePair<,>));
+        }
+
+        /// <summary>
         /// Returns true if the object implements <see cref="IEnumerable"/>.
         /// </summary>
         public static bool IsList(this Type type)
