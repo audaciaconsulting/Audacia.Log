@@ -230,11 +230,17 @@ namespace Audacia.Log.AspNetCore
 
         private void IncludeObject(string name, object data, IDictionary<string, object> parent)
         {
-            // Get the public property names
-            var properties = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             var objectData = new Dictionary<string, object>();
 
-            // Append safe values to objectData
+            // Append safe fields to objectData
+            var fields = data.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var fieldInfo in fields)
+            {
+                IncludeData(fieldInfo.Name, fieldInfo.GetValue(data), objectData);
+            }
+
+            // Append safe properties to objectData
+            var properties = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var propertyInfo in properties)
             {
                 IncludeData(propertyInfo.Name, propertyInfo.GetValue(data), objectData);
