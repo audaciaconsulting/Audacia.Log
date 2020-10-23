@@ -278,7 +278,9 @@ namespace Audacia.Log.AspNetCore
             }
         }
 
+#pragma warning disable ACL1003 // Signature contains too many parameters
         private void IncludeObject(string name, object data, Type type, int depth, IDictionary<string, object> parent)
+#pragma warning restore ACL1003 // Signature contains too many parameters
         {
             var objectData = new Dictionary<string, object>();
 
