@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>Standardized SeriLog logging configuration for Audacia Web APIs.</Description>
+    <Description>Standardized Application Insights logging configuration for Audacia Web APIs.</Description>
     <Copyright>Copyright © Audacia 2019</Copyright>
     <PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
     <PackageIcon>audacia-logo-circle-blue.png</PackageIcon>
@@ -19,11 +19,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Audacia.CodeAnalysis" Version="1.0.20251.2">
+    <PackageReference Include="Audacia.CodeAnalysis" Version="1.0.20353.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Audacia.CodeAnalysis.Analyzers.Helpers" Version="1.0.20216.1" />
+    <PackageReference Include="Audacia.CodeAnalysis.Analyzers.Helpers" Version="1.0.20325.1" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.18.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
