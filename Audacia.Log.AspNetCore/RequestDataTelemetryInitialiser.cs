@@ -7,6 +7,7 @@ using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Audacia.Log.AspNetCore
 {
@@ -45,12 +46,12 @@ namespace Audacia.Log.AspNetCore
         /// </summary>
         /// <param name="httpContextAccessor">Http context accessor</param>
         /// <param name="config">Action log filter configuration</param>
-        public RequestDataTelemetryInitialiser(IHttpContextAccessor httpContextAccessor, ActionLogFilterConfig config)
+        public RequestDataTelemetryInitialiser(IHttpContextAccessor httpContextAccessor, IOptions<ActionLogFilterConfig> config)
         {
             _httpContextAccessor = httpContextAccessor ??
                 throw new ArgumentNullException(nameof(httpContextAccessor));
 
-            Configure(config);
+            Configure(config?.Value);
         }
 
         /// <summary>
@@ -123,6 +124,8 @@ namespace Audacia.Log.AspNetCore
             if (DisableBodyContent) { return; }
 
             if (request?.Form.Any() != true) { return; }
+
+            // TODO JP: get action contenxt and filter arguments from attribute
 
             var arguments = new ActionArgumentDictionary(request.Form, MaxDepth, ExcludeArguments);
 

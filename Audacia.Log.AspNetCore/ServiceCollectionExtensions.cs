@@ -29,6 +29,8 @@ namespace Audacia.Log.AspNetCore
                 throw new ArgumentNullException(nameof(configuration));
             }
 
+            services.Configure<ActionLogFilterConfig>(configuration.GetSection("ActionLogFilter"));
+
             // Configure Application Insights, configuration will be pulled from the appsettings file
             // see: https://docs.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core
             services.AddApplicationInsightsTelemetry();
