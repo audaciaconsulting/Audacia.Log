@@ -65,7 +65,7 @@ public IConfiguration Configuration { get; set; }
 public void ConfigureServices(IServiceCollection services)
 {
 	services.ConfigureRequestBodyLogging(Configuration);
-	services.AddMvcCore(x => x.Filters.Add<ActionLogFilterAttribute>());
+	services.AddControllers(x => x.Filters.Add<ActionLogFilterAttribute>());
 }
 ```
 
