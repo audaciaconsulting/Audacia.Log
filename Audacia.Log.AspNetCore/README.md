@@ -79,9 +79,9 @@ For example using "Password" as the value will filter; Password, password, NewPa
 {
   "ActionLogFilter": {
     "DisableBody": false,
-    "MaxDepth":  32,
+    "MaxDepth":  10,
     "ExcludeArguments": [ "password", "token", "apikey" ],
-    "IncludeClaims": []
+    "IncludeClaims": [ "client_id" ]
   }
 }
 ```
