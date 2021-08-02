@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -175,14 +173,8 @@ namespace Audacia.Log.AspNetCore
                 return log;
             }
 
-            // For each Action Argument;
-            // - Key is the parameter name from the controller action.
-            // - Value is the parameter object from the controller action.
-            var arguments = new Dictionary<string, object>();
-            foreach (var argument in context.ActionArguments)
-            {
-                IncludeData(argument.Key, argument.Value, 0, arguments);
-            }
+            // Redact PII
+            var arguments = new ActionArgumentDictionary(context.ActionArguments, MaxDepth, ExcludeArguments);
 
             return log.ForContext("Arguments", arguments, true);
         }
@@ -200,109 +192,6 @@ namespace Audacia.Log.AspNetCore
             }
 
             return returnLog;
-        }
-
-#pragma warning disable ACL1002 // Member or local function contains too many statements
-        private void IncludeData(string name, object data, int depth, IDictionary<string, object> parent)
-#pragma warning restore ACL1002 // Member or local function contains too many statements
-        {
-            // Skip logging of null data
-            // Redact when parameter names contain excluded words
-            if (depth >= MaxDepth ||
-                data == null ||
-                name.ContainsStringCaseInsensitive(ExcludeArguments))
-            {
-                return;
-            }
-
-            var type = data.GetType();
-
-            // Filter insecure keys from dictionaries
-            if (type.IsDictionary())
-            {
-                IncludeDictionary(name, data as IEnumerable, depth, parent);
-                return;
-            }
-
-            // Filter insecure objects from lists
-            if (type.IsList())
-            {
-                IncludeList(name, data as IEnumerable, depth, parent);
-                return;
-            }
-
-            // Filter insecure nested parameters from classes / structs
-            if (type.IsClassObject() || type.IsNonDisplayableStruct(data))
-            {
-                IncludeObject(name, data, type, depth, parent);
-                return;
-            }
-
-            // Include parameter name and value on the parent object's dictionary
-            parent.Add(name, data);
-        }
-
-        private void IncludeDictionary(string name, IEnumerable data, int depth, IDictionary<string, object> parent)
-        {
-            var objectData = new Dictionary<string, object>();
-            foreach (var entry in data)
-            {
-                var key = entry.GetDictionaryKey();
-                var value = entry.GetDictionaryValue();
-                IncludeData(key, value, (depth + 1), objectData);
-            }
-
-            // Append data to the parent object's dictionary
-            if (objectData.Count > 0)
-            {
-                parent.Add(name, objectData);
-            }
-        }
-
-        private void IncludeList(string name, IEnumerable data, int depth, IDictionary<string, object> parent)
-        {
-            var objectData = new Dictionary<string, object>();
-
-            var index = 0;
-            var enumerator = data.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                IncludeData($"{index}", enumerator.Current, (depth + 1), objectData);
-                index++;
-            }
-
-            // Append data to the parent object's dictionary
-            if (objectData.Count > 0)
-            {
-                parent.Add(name, objectData.Values);
-            }
-        }
-
-#pragma warning disable ACL1003 // Signature contains too many parameters
-        private void IncludeObject(string name, object data, Type type, int depth, IDictionary<string, object> parent)
-#pragma warning restore ACL1003 // Signature contains too many parameters
-        {
-            var objectData = new Dictionary<string, object>();
-
-            // Append safe fields to objectData
-            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var fieldInfo in fields)
-            {
-                IncludeData(fieldInfo.Name, fieldInfo.GetValue(data), (depth + 1), objectData);
-            }
-
-            // Append safe properties to objectData
-            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var propertyInfo in properties)
-            {
-                IncludeData(propertyInfo.Name, propertyInfo.GetValue(data), (depth + 1), objectData);
-            }
-
-            // Append objectData to the parent object's dictionary
-            if (objectData.Count > 0)
-            {
-                parent.Add(name, objectData);
-            }
         }
 
         private static void LogFinish(object result, string resultType, string actionName, ILogger log)
