@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
+using Audacia.Log.AspNetCore.Internal;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 
 namespace Audacia.Log.AspNetCore
 {
     /// <summary>
     /// An application insights telemetery initialiser that attaches claims and form data to the request.
     /// </summary>
-    public sealed class RequestDataTelemetryInitialiser : ITelemetryInitializer
+    public sealed class RequestBodyTelemetryInitialiser : ITelemetryInitializer
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IActionLogFilterConfigAccessor _configAccessor;
 
         /// <summary>Gets the names of claims to include in the logs. If empty, no claims are included.</summary>
         public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
@@ -45,23 +46,25 @@ namespace Audacia.Log.AspNetCore
         /// Creates an instance of RequestDataTelemetryInitialiser.
         /// </summary>
         /// <param name="httpContextAccessor">Http context accessor</param>
-        /// <param name="config">Action log filter configuration</param>
-        public RequestDataTelemetryInitialiser(IHttpContextAccessor httpContextAccessor, IOptions<ActionLogFilterConfig> config)
+        /// <param name="configAccessor">Action log filter configuration accessor</param>
+        public RequestBodyTelemetryInitialiser(IHttpContextAccessor httpContextAccessor, IActionLogFilterConfigAccessor configAccessor)
         {
             _httpContextAccessor = httpContextAccessor ??
                 throw new ArgumentNullException(nameof(httpContextAccessor));
 
-            Configure(config?.Value);
+            _configAccessor = configAccessor ??
+                throw new ArgumentNullException(nameof(configAccessor));
         }
 
-        /// <summary>
-        /// Attaches claims and form data to the request telemetry.
-        /// </summary>
-        /// <param name="telemetry"></param>
+        /// <inheritdoc/>
         public void Initialize(ITelemetry telemetry)
         {
             // Ensure current telemetry is a request log
             if (!(telemetry is RequestTelemetry requestTelemetry)) { return; }
+
+            // Apply configuration from global config and attribute on controller action
+            Configure(_configAccessor.GlobalConfiguration);
+            Configure(_configAccessor.ActionConfiguration);
 
             var httpContext = _httpContextAccessor.HttpContext;
 
@@ -124,8 +127,6 @@ namespace Audacia.Log.AspNetCore
             if (DisableBodyContent) { return; }
 
             if (request?.Form.Any() != true) { return; }
-
-            // TODO JP: get action contenxt and filter arguments from attribute
 
             var arguments = new ActionArgumentDictionary(request.Form, MaxDepth, ExcludeArguments);
 

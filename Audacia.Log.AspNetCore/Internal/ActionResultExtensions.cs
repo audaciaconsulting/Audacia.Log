@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Audacia.Log.AspNetCore
+namespace Audacia.Log.AspNetCore.Internal
 {
     internal static class ActionResultExtensions
     {
