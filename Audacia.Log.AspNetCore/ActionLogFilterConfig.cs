@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Audacia.Log.AspNetCore
 {
     /// <summary>
@@ -8,12 +10,12 @@ namespace Audacia.Log.AspNetCore
         /// <summary>
         /// Gets or sets the names of arguments to exclude from the logs.
         /// </summary>
-        public string[] ExcludeArguments { get; set; }
+        public IReadOnlyCollection<string> ExcludeArguments { get; set; }
 
         /// <summary>
         /// Gets or sets the names of claims to include in the logs.
         /// </summary>
-        public string[] IncludeClaims { get; set; }
+        public IReadOnlyCollection<string> IncludeClaims { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the request body data should be logged.

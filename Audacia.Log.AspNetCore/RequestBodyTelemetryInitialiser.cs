@@ -95,7 +95,7 @@ namespace Audacia.Log.AspNetCore
                 MaxDepth = config.MaxDepth;
             }
 
-            if (config.ExcludeArguments?.Length > 0)
+            if (config.ExcludeArguments?.Any() == true)
             {
                 foreach (var item in config.ExcludeArguments)
                 {
@@ -108,7 +108,7 @@ namespace Audacia.Log.AspNetCore
                 }
             }
 
-            if (config.IncludeClaims?.Length > 0)
+            if (config.IncludeClaims?.Any() == true)
             {
                 foreach (var item in config.IncludeClaims)
                 {
