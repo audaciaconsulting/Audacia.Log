@@ -17,7 +17,6 @@ namespace Audacia.Log.AspNetCore
     public sealed class RequestBodyTelemetryInitialiser : ITelemetryInitializer
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IActionLogFilterConfigAccessor _configAccessor;
 
         /// <summary>Gets the names of claims to include in the logs. If empty, no claims are included.</summary>
         public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
@@ -46,14 +45,10 @@ namespace Audacia.Log.AspNetCore
         /// Creates an instance of RequestDataTelemetryInitialiser.
         /// </summary>
         /// <param name="httpContextAccessor">Http context accessor</param>
-        /// <param name="configAccessor">Action log filter configuration accessor</param>
-        public RequestBodyTelemetryInitialiser(IHttpContextAccessor httpContextAccessor, IActionLogFilterConfigAccessor configAccessor)
+        public RequestBodyTelemetryInitialiser(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor ??
                 throw new ArgumentNullException(nameof(httpContextAccessor));
-
-            _configAccessor = configAccessor ??
-                throw new ArgumentNullException(nameof(configAccessor));
         }
 
         /// <inheritdoc/>
@@ -63,8 +58,11 @@ namespace Audacia.Log.AspNetCore
             if (!(telemetry is RequestTelemetry requestTelemetry)) { return; }
 
             // Apply configuration from global config and attribute on controller action
-            Configure(_configAccessor.GlobalConfiguration);
-            Configure(_configAccessor.ActionConfiguration);
+            var configurationAccessor = GetActionLogFilterConfigAccessor();
+
+            Configure(configurationAccessor.GlobalConfiguration);
+
+            Configure(configurationAccessor.ActionConfiguration);
 
             var httpContext = _httpContextAccessor.HttpContext;
 
@@ -120,6 +118,19 @@ namespace Audacia.Log.AspNetCore
                     IncludeClaims.Add(item);
                 }
             }
+        }
+
+        private IActionLogFilterConfigAccessor GetActionLogFilterConfigAccessor()
+        {
+            var accessor = _httpContextAccessor.HttpContext.RequestServices.GetService(typeof(IActionLogFilterConfigAccessor));
+            if (accessor == null)
+            {
+#pragma warning disable CA2201 // Do not raise reserved exception types
+                throw new NullReferenceException($"{nameof(IActionLogFilterConfigAccessor)} not configured in startup, make sure {nameof(ServiceCollectionExtensions.ConfigureRequestBodyLogging)} was called.");
+#pragma warning restore CA2201 // Do not raise reserved exception types
+            }
+
+            return (IActionLogFilterConfigAccessor)accessor;
         }
 
         private void LogBodyContent(HttpRequest request, RequestTelemetry requestTelemetry)
