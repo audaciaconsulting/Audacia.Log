@@ -8,13 +8,12 @@ using Microsoft.AspNetCore.Http;
 namespace Audacia.Log.AspNetCore.Internal
 {
     /// <summary>
-    /// An application insights telemetery initialiser that attaches request telemetry to the http context,
-    /// to be used later by <see cref="LogActionFilterAttribute"/>.
+    /// Attaches request content stored on the <see cref="HttpContext"/> to <see cref="RequestTelemetry"/>.
     /// </summary>
     internal sealed class LogActionTelemetryInitialiser : ITelemetryInitializer
     {
         public const string ActionArguments = "ActionArguments";
-        
+   
         public const string ActionClaims = "ActionClaims";
 
         public const string ActionUserId = "ActionUserId";

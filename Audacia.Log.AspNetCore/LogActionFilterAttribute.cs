@@ -12,7 +12,9 @@ using Microsoft.Extensions.Options;
 
 namespace Audacia.Log.AspNetCore
 {
-    /// <summary>Logs requests and responses for each Controller Action.</summary>
+    /// <summary>
+    /// Attaches request content for each controller action to the <see cref="HttpContext"/> to be used later by Application Insights Telemetry.
+    /// </summary>
     public sealed class LogActionFilterAttribute : ActionFilterAttribute
     {
         /// <summary>Gets the names of claims to include in the logs. If empty, no claims are included.</summary>
