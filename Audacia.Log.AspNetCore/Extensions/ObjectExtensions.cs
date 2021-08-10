@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace Audacia.Log.AspNetCore.Internal
+namespace Audacia.Log.AspNetCore.Extensions
 {
     internal static class ObjectExtensions
     {

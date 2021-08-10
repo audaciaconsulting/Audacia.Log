@@ -1,4 +1,5 @@
 using System;
+using Audacia.Log.AspNetCore.Internal;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
 using Microsoft.AspNetCore.Http;

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Audacia.Log.AspNetCore.Internal
+namespace Audacia.Log.AspNetCore.Extensions
 {
     internal static class StringExtensions
     {

@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using Microsoft.AspNetCore.Http;
+using System.Text;
+using Audacia.Log.AspNetCore.Extensions;
 
 namespace Audacia.Log.AspNetCore.Internal
 {
     /// <summary>
     /// Creates a dictionary of form values on the action, excluding parameters marked as personal information.
     /// </summary>
-    internal class ActionArgumentDictionary : Dictionary<string, object>
+    internal sealed class ActionArgumentDictionary : Dictionary<string, object>
     {
         private ICollection<string> ExcludedArguments { get; }
 
@@ -51,22 +53,7 @@ namespace Audacia.Log.AspNetCore.Internal
         /// <summary>
         /// Returns dictionary content as a json object string.
         /// </summary>
-        public override string ToString() => DictionaryToString(this);
-
-        private string DictionaryToString(IDictionary<string, object> dictionary)
-        {
-            var outputData = dictionary.Select(kv =>
-            {
-                if (kv.Value is IDictionary<string, object> data)
-                {
-                    return DictionaryToString(data);
-                }
-
-                return $"\"{kv.Key}\": \"{kv.Value}\"";
-            }).ToArray();
-
-            return $"{{ {string.Join(", ", outputData)} }}";
-        }
+        public override string ToString() => AppendDictionary(new StringBuilder(), this).ToString();
 
 #pragma warning disable ACL1002 // Member or local function contains too many statements
         private void IncludeData(string name, object data, int depth, IDictionary<string, object> parent)
@@ -167,6 +154,82 @@ namespace Audacia.Log.AspNetCore.Internal
             {
                 parent.Add(name, objectData);
             }
+        }
+
+#pragma warning disable ACL1002 // Member or local function contains too many statements
+        private static StringBuilder AppendDictionary(StringBuilder builder, IDictionary<string, object> dictionary)
+#pragma warning restore ACL1002 // Member or local function contains too many statements
+        {
+            builder.Append("{");
+
+            var lastIndex = dictionary.Count - 1;
+            for (var index = 0; index < dictionary.Count; index++)
+            {
+                var entry = dictionary.ElementAt(index);
+
+                builder.AppendFormat(CultureInfo.InvariantCulture, "\"{0}\": ", entry.Key);
+
+                if (entry.Value is Dictionary<string, object> nestedObject)
+                {
+                    AppendDictionary(builder, nestedObject);
+                }
+                else if (entry.Value is ValueCollection list)
+                {
+                    AppendValueCollection(builder, list);
+                }
+                else
+                {
+                    AppendValue(builder, entry.Value.ToString());
+                }
+
+                if (index < lastIndex)
+                {
+                    builder.Append(", ");
+                }
+            }
+
+            builder.Append("}");
+
+            return builder;
+        }
+
+        private static void AppendValue(StringBuilder builder, string value)
+        {
+            // Escape double quotes before writing to value
+            builder.AppendFormat(CultureInfo.InvariantCulture, "\"{0}\"", value.Replace("\"", "\\\""));
+        }
+
+#pragma warning disable ACL1002 // Member or local function contains too many statements
+        private static void AppendValueCollection(StringBuilder builder, ValueCollection valueCollection)
+#pragma warning restore ACL1002 // Member or local function contains too many statements
+        {
+            builder.Append("[");
+
+            var lastIndex = valueCollection.Count - 1;
+            for (var index = 0; index < valueCollection.Count; index++)
+            {
+                var value = valueCollection.ElementAt(index);
+
+                if (value is Dictionary<string, object> dictionary)
+                {
+                    AppendDictionary(builder, dictionary);
+                }
+                else if (value is ValueCollection list)
+                {
+                    AppendValueCollection(builder, list);
+                }
+                else
+                {
+                    AppendValue(builder, value.ToString());
+                }
+
+                if (index < lastIndex)
+                {
+                    builder.Append(", ");
+                }
+            }
+
+            builder.Append("]");
         }
     }
 }

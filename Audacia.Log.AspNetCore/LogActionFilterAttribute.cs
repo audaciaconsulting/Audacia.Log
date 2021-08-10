@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Threading.Tasks;
+using Audacia.Log.AspNetCore.Extensions;
 using Audacia.Log.AspNetCore.Internal;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -14,8 +15,6 @@ namespace Audacia.Log.AspNetCore
     /// <summary>Logs requests and responses for each Controller Action.</summary>
     public sealed class LogActionFilterAttribute : ActionFilterAttribute
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
         /// <summary>Gets the names of claims to include in the logs. If empty, no claims are included.</summary>
         public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
 
@@ -45,37 +44,31 @@ namespace Audacia.Log.AspNetCore
         /// Creates a new instance of <see cref="ActionFilterAttribute"/>.
         /// </summary>
         /// <param name="options">Global log filter configuration</param>
-        /// <param name="httpContextAccessor">HTTP context accessor</param>
 #pragma warning disable CA1019 // Define accessors for attribute arguments
-        public LogActionFilterAttribute(IOptions<LogActionFilterConfig> options, IHttpContextAccessor httpContextAccessor)
+        public LogActionFilterAttribute(IOptions<LogActionFilterConfig> options)
 #pragma warning restore CA1019 // Define accessors for attribute arguments
         {
-            _httpContextAccessor = httpContextAccessor;
-
             // Apply global log filters
             Configure(options?.Value);
         }
 
         /// <inheritdoc/>
-        public override void OnActionExecuting(ActionExecutingContext context)
+        public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var request = context?.HttpContext?.Request;
-            if (request != null && (request.Method == HttpMethods.Post || request.Method == HttpMethods.Put))
+            var httpContext = context?.HttpContext;
+            if (httpContext?.HasFormData() == true)
             {
                 // Apply action specific log filters
                 Configure(GetControllerActionFilter(context));
 
-                // Add request info to telemetry
-                var telemetry = _httpContextAccessor.HttpContext.Items["Telemetry"] as RequestTelemetry;
-                if (telemetry != null)
-                {
-                    LogUserInfo(_httpContextAccessor.HttpContext.User, telemetry);
+                AddUserInfo(httpContext.User, httpContext);
 
-                    LogClaims(_httpContextAccessor.HttpContext.User, telemetry);
+                AddClaims(httpContext.User, httpContext);
 
-                    LogBodyContent(context, telemetry);
-                }
+                AddBodyContent(context, httpContext);
             }
+
+            return base.OnActionExecutionAsync(context, next);
         }
 
         /// <summary>
@@ -125,7 +118,7 @@ namespace Audacia.Log.AspNetCore
             }
         }
 
-        private void LogBodyContent(ActionExecutingContext context, RequestTelemetry requestTelemetry)
+        private void AddBodyContent(ActionExecutingContext context, HttpContext httpContext)
         {
             if (DisableBodyContent) { return; }
 
@@ -134,11 +127,11 @@ namespace Audacia.Log.AspNetCore
 
             if (arguments.Any())
             {
-                requestTelemetry.Properties.Add("Arguments", arguments.ToString());
+                httpContext.Items.Add(LogActionTelemetryInitialiser.ActionArguments, arguments);
             }
         }
 
-        private void LogClaims(IPrincipal principal, RequestTelemetry requestTelemetry)
+        private void AddClaims(IPrincipal principal, HttpContext httpContext)
         {
             if (principal?.Identity?.IsAuthenticated != true) { return; }
 
@@ -151,11 +144,11 @@ namespace Audacia.Log.AspNetCore
 
             if (claims.Any())
             {
-                requestTelemetry.Properties.Add("Claims", $"{{ {string.Join(", ", claims)} }}");
+                httpContext.Items.Add(LogActionTelemetryInitialiser.ActionClaims, $"{{ {string.Join(", ", claims)} }}");
             }
         }
 
-        private static void LogUserInfo(IPrincipal principal, RequestTelemetry requestTelemetry)
+        private static void AddUserInfo(IPrincipal principal, HttpContext httpContext)
         {
             if (principal?.Identity?.IsAuthenticated != true) { return; }
 
@@ -164,13 +157,13 @@ namespace Audacia.Log.AspNetCore
             var userId = identity.FindFirst("sub")?.Value;
             if (!string.IsNullOrEmpty(userId))
             {
-                requestTelemetry.Properties.Add("UserId", userId);
+                httpContext.Items.Add(LogActionTelemetryInitialiser.ActionUserId, userId);
             }
 
             var userRoles = identity.FindAll("role").Select(c => c.Value);
             if (userRoles.Any()) 
             {
-                requestTelemetry.Properties.Add("UserRoles", string.Join(", ", userRoles));
+                httpContext.Items.Add(LogActionTelemetryInitialiser.ActionUserRoles, string.Join(", ", userRoles));
             }
         }
 
