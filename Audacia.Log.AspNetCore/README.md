@@ -2,9 +2,11 @@
 
 Standardized logging configuration for Audacia ASP.NET Core Web projects using Application Insights.
 
+This is a standalone library (from v2.0.0 onwards) and is not dependent on Audacia.Log or Serilog. Please remove them from your web application when upgrading as going forwards the preferred approach is to use purely Application Insights and Microsoft logging abstractions.
+
 ### Usage
 
-Copy the following json into youre `appsettings.json` file. Configure the Instrumentation Key and  the QuickPulseApi Key to enable application insights for your app service.
+Copy the following json into your `appsettings.json` file. Configure the Instrumentation Key and  the QuickPulseApi Key to enable application insights for your app service.
 
  - For more information on Application Insights see, https://docs.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core
  - For more information on QuickPulse Metrics see, https://docs.microsoft.com/en-us/azure/azure-monitor/app/live-stream#secure-the-control-channel
