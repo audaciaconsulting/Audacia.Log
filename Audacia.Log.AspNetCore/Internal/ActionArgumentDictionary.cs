@@ -167,7 +167,7 @@ namespace Audacia.Log.AspNetCore.Internal
             {
                 var entry = dictionary.ElementAt(index);
 
-                builder.AppendFormat(CultureInfo.InvariantCulture, "\"{0}\": ", entry.Key);
+                builder.AppendFormat(CultureInfo.InvariantCulture, " \"{0}\": ", entry.Key);
 
                 if (entry.Value is Dictionary<string, object> nestedObject)
                 {
@@ -184,7 +184,11 @@ namespace Audacia.Log.AspNetCore.Internal
 
                 if (index < lastIndex)
                 {
-                    builder.Append(", ");
+                    builder.Append(",");
+                }
+                else
+                {
+                    builder.Append(" ");
                 }
             }
 
@@ -208,6 +212,8 @@ namespace Audacia.Log.AspNetCore.Internal
             var lastIndex = valueCollection.Count - 1;
             for (var index = 0; index < valueCollection.Count; index++)
             {
+                builder.Append(" ");
+
                 var value = valueCollection.ElementAt(index);
 
                 if (value is Dictionary<string, object> dictionary)
@@ -225,7 +231,11 @@ namespace Audacia.Log.AspNetCore.Internal
 
                 if (index < lastIndex)
                 {
-                    builder.Append(", ");
+                    builder.Append(",");
+                }
+                else 
+                {
+                    builder.Append(" ");
                 }
             }
 
