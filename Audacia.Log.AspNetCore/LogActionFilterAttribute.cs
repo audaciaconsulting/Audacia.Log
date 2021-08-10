@@ -1,20 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Audacia.Log.AspNetCore.Internal;
-using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 
 namespace Audacia.Log.AspNetCore
 {
-    /// <summary>
-    /// An application insights telemetery initialiser that attaches claims and form data to the request.
-    /// </summary>
-    public sealed class RequestBodyTelemetryInitialiser : ITelemetryInitializer
+    /// <summary>Logs requests and responses for each Controller Action.</summary>
+    public sealed class LogActionFilterAttribute : ActionFilterAttribute
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -41,36 +39,43 @@ namespace Audacia.Log.AspNetCore
         /// </summary>
         public bool DisableBodyContent { get; set; }
 
+
         /// <summary>
-        /// Creates an instance of RequestDataTelemetryInitialiser.
+        /// Initializes a new instance of the <see cref="LogActionFilterAttribute"/> class.
+        /// Creates a new instance of <see cref="ActionFilterAttribute"/>.
         /// </summary>
-        /// <param name="httpContextAccessor">Http context accessor</param>
-        public RequestBodyTelemetryInitialiser(IHttpContextAccessor httpContextAccessor)
+        /// <param name="options">Global log filter configuration</param>
+        /// <param name="httpContextAccessor">HTTP context accessor</param>
+#pragma warning disable CA1019 // Define accessors for attribute arguments
+        public LogActionFilterAttribute(IOptions<LogActionFilterConfig> options, IHttpContextAccessor httpContextAccessor)
+#pragma warning restore CA1019 // Define accessors for attribute arguments
         {
-            _httpContextAccessor = httpContextAccessor ??
-                throw new ArgumentNullException(nameof(httpContextAccessor));
+            _httpContextAccessor = httpContextAccessor;
+
+            // Apply global log filters
+            Configure(options?.Value);
         }
 
         /// <inheritdoc/>
-        public void Initialize(ITelemetry telemetry)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            // Ensure current telemetry is a request log
-            if (!(telemetry is RequestTelemetry requestTelemetry)) { return; }
+            var request = context?.HttpContext?.Request;
+            if (request != null && (request.Method == HttpMethods.Post || request.Method == HttpMethods.Put))
+            {
+                // Apply action specific log filters
+                Configure(GetControllerActionFilter(context));
 
-            // Apply configuration from global config and attribute on controller action
-            var configurationAccessor = GetActionLogFilterConfigAccessor();
+                // Add request info to telemetry
+                var telemetry = _httpContextAccessor.HttpContext.Items["Telemetry"] as RequestTelemetry;
+                if (telemetry != null)
+                {
+                    LogUserInfo(_httpContextAccessor.HttpContext.User, telemetry);
 
-            Configure(configurationAccessor.GlobalConfiguration);
+                    LogClaims(_httpContextAccessor.HttpContext.User, telemetry);
 
-            Configure(configurationAccessor.ActionConfiguration);
-
-            var httpContext = _httpContextAccessor.HttpContext;
-
-            LogUserInfo(httpContext.User, requestTelemetry);
-
-            LogClaims(httpContext.User, requestTelemetry);
-
-            LogBodyContent(httpContext.Request, requestTelemetry);
+                    LogBodyContent(context, telemetry);
+                }
+            }
         }
 
         /// <summary>
@@ -78,7 +83,7 @@ namespace Audacia.Log.AspNetCore
         /// </summary>
         /// <param name="config">global or action config.</param>
 #pragma warning disable ACL1002 // Member or local function contains too many statements
-        private void Configure(ActionLogFilterConfig config)
+        private void Configure(LogActionFilterConfig config)
 #pragma warning restore ACL1002 // Member or local function contains too many statements
         {
             if (config == null)
@@ -120,28 +125,17 @@ namespace Audacia.Log.AspNetCore
             }
         }
 
-        private IActionLogFilterConfigAccessor GetActionLogFilterConfigAccessor()
-        {
-            var accessor = _httpContextAccessor.HttpContext.RequestServices.GetService(typeof(IActionLogFilterConfigAccessor));
-            if (accessor == null)
-            {
-#pragma warning disable CA2201 // Do not raise reserved exception types
-                throw new NullReferenceException($"{nameof(IActionLogFilterConfigAccessor)} not configured in startup, make sure {nameof(ServiceCollectionExtensions.ConfigureRequestBodyLogging)} was called.");
-#pragma warning restore CA2201 // Do not raise reserved exception types
-            }
-
-            return (IActionLogFilterConfigAccessor)accessor;
-        }
-
-        private void LogBodyContent(HttpRequest request, RequestTelemetry requestTelemetry)
+        private void LogBodyContent(ActionExecutingContext context, RequestTelemetry requestTelemetry)
         {
             if (DisableBodyContent) { return; }
 
-            if (request?.Form.Any() != true) { return; }
+            // Copy action content and remove PII
+            var arguments = new ActionArgumentDictionary(context.ActionArguments, MaxDepth, ExcludeArguments);
 
-            var arguments = new ActionArgumentDictionary(request.Form, MaxDepth, ExcludeArguments);
-
-            requestTelemetry.Properties.Add("Arguments", arguments.ToString());
+            if (arguments.Any())
+            {
+                requestTelemetry.Properties.Add("Arguments", arguments.ToString());
+            }
         }
 
         private void LogClaims(IPrincipal principal, RequestTelemetry requestTelemetry)
@@ -178,6 +172,22 @@ namespace Audacia.Log.AspNetCore
             {
                 requestTelemetry.Properties.Add("UserRoles", string.Join(", ", userRoles));
             }
+        }
+
+        private static LogActionFilterConfig GetControllerActionFilter(ActionExecutingContext context)
+        {
+            // Get attribute for per request configuration
+            return context.ActionDescriptor.FilterDescriptors
+                .Select(descriptor => descriptor.Filter)
+                .OfType<LogFilterAttribute>()
+                .Select(attribute => new LogActionFilterConfig
+                {
+                    DisableBodyContent = attribute.DisableBodyContent,
+                    ExcludeArguments = attribute.ExcludeArguments,
+                    IncludeClaims = attribute.IncludeClaims,
+                    MaxDepth = attribute.MaxDepth
+                })
+                .FirstOrDefault();
         }
     }
 }

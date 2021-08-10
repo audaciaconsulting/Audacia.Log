@@ -64,20 +64,20 @@ public IConfiguration Configuration { get; set; }
 
 public void ConfigureServices(IServiceCollection services)
 {
-	services.ConfigureRequestBodyLogging(Configuration);
-	services.AddControllers(x => x.Filters.Add<ActionLogFilterAttribute>());
+	services.ConfigureActionContentLogging(Configuration);
+	services.AddControllers(x => x.Filters.Add<LogActionFilterAttribute>());
 }
 ```
 
 ##### Configure global request filtering
-To globally configure the logging of actions you must add the `ActionLogFilter` section to your `appsettings.json` file.
+To globally configure the logging of actions you must add the `LogActionFilter` section to your `appsettings.json` file.
 This will allow the redaction of specific parameters from the request body during action logs.
 This is case insensitive and will filter out parameters that contain the provided words.
 For example using "Password" as the value will filter; Password, password, NewPassword, ConfirmPassword, etc.
 
 ```json
 {
-  "ActionLogFilter": {
+  "LogActionFilter": {
     "DisableBody": false,
     "MaxDepth":  10,
     "ExcludeArguments": [ "password", "token", "apikey" ],

@@ -49,7 +49,7 @@ namespace Audacia.Log.AspNetCore
         /// </summary>
         /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
-        public static IServiceCollection ConfigureRequestBodyLogging(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureActionContentLogging(this IServiceCollection services, IConfiguration configuration)
         {
             if (services == null)
             {
@@ -61,10 +61,14 @@ namespace Audacia.Log.AspNetCore
                 throw new ArgumentNullException(nameof(configuration));
             }
 
-            services.Configure<ActionLogFilterConfig>(configuration.GetSection("ActionLogFilter"));
-            services.AddScoped<IActionLogFilterConfigAccessor, ActionLogFilterConfigAccessor>();
-            services.AddSingleton<ITelemetryInitializer, RequestBodyTelemetryInitialiser>();
+            // Required for attaching the request telemetry to the HttpContext
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            // Configure global configuration for the LogActionFilter
+            services.Configure<LogActionFilterConfig>(configuration.GetSection("LogActionFilter"));
+
+            // Add telemetry initialiser that attaches itself to the HttpContext, so that the LogActionFilter may add properties to the request
+            services.AddSingleton<ITelemetryInitializer, LogActionTelemetryInitialiser>();
 
             return services;
         }

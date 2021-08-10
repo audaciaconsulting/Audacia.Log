@@ -49,38 +49,6 @@ namespace Audacia.Log.AspNetCore.Internal
         }
 
         /// <summary>
-        /// Creates a dictionary of form values on the action, excluding parameters marked as personal information.
-        /// </summary>
-        /// <param name="formCollection">The form collection on the request</param>
-        /// <param name="maxDepth">Max object depth to inspect before stopping</param>
-        /// <param name="excludedArguments">Parameter names where content should be redacted</param>
-        public ActionArgumentDictionary(IFormCollection formCollection, int maxDepth, ICollection<string> excludedArguments)
-        {
-            if (formCollection == null)
-            {
-                throw new ArgumentNullException(nameof(formCollection));
-            }
-
-            if (maxDepth < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(maxDepth), maxDepth, "MaxDepth must be zero or above");
-            }
-
-            if (excludedArguments == null)
-            {
-                throw new ArgumentNullException(nameof(excludedArguments));
-            }
-
-            MaxDepth = maxDepth;
-            ExcludedArguments = excludedArguments;
-
-            foreach (var argument in formCollection)
-            {
-                IncludeData(argument.Key, argument.Value, 0, this);
-            }
-        }
-
-        /// <summary>
         /// Returns dictionary content as a json object string.
         /// </summary>
         public override string ToString() => DictionaryToString(this);

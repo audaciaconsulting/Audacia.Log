@@ -3,9 +3,9 @@ using System.Collections.Generic;
 namespace Audacia.Log.AspNetCore
 {
     /// <summary>
-    /// Allows the configuration of the <see cref="ActionLogFilterAttribute"/> per request.
+    /// Allows the configuration of the <see cref="LogActionFilterAttribute"/> per request.
     /// </summary>
-    public sealed class ActionLogFilterConfig
+    public sealed class LogActionFilterConfig
     {
         /// <summary>
         /// Gets or sets the names of arguments to exclude from the logs.
