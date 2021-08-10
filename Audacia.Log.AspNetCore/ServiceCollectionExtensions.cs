@@ -67,7 +67,7 @@ namespace Audacia.Log.AspNetCore
             // Configure global configuration for the LogActionFilter
             services.Configure<LogActionFilterConfig>(configuration.GetSection("LogActionFilter"));
 
-            // Add telemetry initialiser that attaches itself to the HttpContext, so that the LogActionFilter may add properties to the request
+            // Add telemetry initialiser to attach request data captured by LogActionFilter
             services.AddSingleton<ITelemetryInitializer, LogActionTelemetryInitialiser>();
 
             return services;
