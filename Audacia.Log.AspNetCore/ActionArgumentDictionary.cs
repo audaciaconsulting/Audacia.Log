@@ -7,12 +7,12 @@ using System.Reflection;
 using System.Text;
 using Audacia.Log.AspNetCore.Extensions;
 
-namespace Audacia.Log.AspNetCore.Internal
+namespace Audacia.Log.AspNetCore
 {
     /// <summary>
     /// Creates a dictionary of form values on the action, excluding parameters marked as personal information.
     /// </summary>
-    internal sealed class ActionArgumentDictionary : Dictionary<string, object>
+    public sealed class ActionArgumentDictionary : Dictionary<string, object>
     {
         private ICollection<string> ExcludedArguments { get; }
 

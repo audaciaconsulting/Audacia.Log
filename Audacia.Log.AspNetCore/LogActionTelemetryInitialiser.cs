@@ -5,20 +5,20 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
 
-namespace Audacia.Log.AspNetCore.Internal
+namespace Audacia.Log.AspNetCore
 {
     /// <summary>
     /// Attaches request content stored on the <see cref="HttpContext"/> to <see cref="RequestTelemetry"/>.
     /// </summary>
-    internal sealed class LogActionTelemetryInitialiser : ITelemetryInitializer
+    public sealed class LogActionTelemetryInitialiser : ITelemetryInitializer
     {
-        public const string ActionArguments = "ActionArguments";
-   
-        public const string ActionClaims = "ActionClaims";
+        internal const string ActionArguments = "ActionArguments";
 
-        public const string ActionUserId = "ActionUserId";
+        internal const string ActionClaims = "ActionClaims";
 
-        public const string ActionUserRoles = "ActionUserRoles";
+        internal const string ActionUserId = "ActionUserId";
+
+        internal const string ActionUserRoles = "ActionUserRoles";
 
         private readonly IHttpContextAccessor _httpContextAccessor;
 

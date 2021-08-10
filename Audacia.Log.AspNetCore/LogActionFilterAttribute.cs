@@ -5,7 +5,6 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Audacia.Log.AspNetCore.Extensions;
-using Audacia.Log.AspNetCore.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -39,7 +38,6 @@ namespace Audacia.Log.AspNetCore
         /// Gets or sets a value indicating whether the logging of all data in the request body is disabled.
         /// </summary>
         public bool DisableBodyContent { get; set; }
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LogActionFilterAttribute"/> class.
