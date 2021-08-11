@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Audacia.Log.AspNetCore
+namespace Audacia.Log.AspNetCore.Extensions
 {
     internal static class TypeExtensions
     {

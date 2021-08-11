@@ -1,38 +1,56 @@
 ## Audacia.Log.AspNetCore
 
-Standardized logging configuration for Audacia ASP.NET Core Web projects using [Serilog](https://serilog.net).
+Standardized logging configuration for Audacia ASP.NET Core Web projects using Application Insights.
+
+This is a standalone library (from v2.0.0 onwards) and is not dependent on Audacia.Log or Serilog. Please remove them from your web application when upgrading as going forwards the preferred approach is to use purely Application Insights and Microsoft logging abstractions.
 
 ### Usage
 
-After following the instructions [here](https://dev.azure.com/audacia/Audacia/_git/Audacia.Log?path=%2FREADME.md) you will have Serilog configured and can start integrating it into the ASP.NET pipeline.
+Copy the following json into your `appsettings.json` file. Configure the Instrumentation Key and  the QuickPulseApi Key to enable application insights for your app service.
 
-Settings can also be specified programatically using the `LogConfig` type, however, the easiest way to specify logging settings is using the following entry in your `appsettings.json` file:
+ - For more information on Application Insights see, https://docs.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core
+ - For more information on QuickPulse Metrics see, https://docs.microsoft.com/en-us/azure/azure-monitor/app/live-stream#secure-the-control-channel
+
+The default logging providers are Debug, Console, EventLog, EventSource, ApplicationInsights. LogLevel on its own applies to all providers. Log levels can be altered by specifying the assembly name and log level for a logging provider.
 
 ```json
-"Logging": {
-	"ApplicationName": "ExampleApp",
-	"EnvironmentName": "User Acceptance",
-	"ApplicationInsightsKey": "00000000-0000-0000-0000-000000000000",
-},
+{
+  "ApplicationInsights": {
+    "InstrumentationKey": "00000000-0000-0000-0000-000000000000",
+    "EnableAdaptiveSampling": false,
+    "QuickPulseApiKey": ""
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information"
+    },
+    "EventLog": {
+      "Default": "Warning"
+    },
+    "ApplicationInsights": {
+      "IncludeScopes": true,
+      "LogLevel": {
+        "Default": "Information",
+        "Microsoft": "Warning",
+        "Microsoft.Hosting.Lifetime": "Warning",
+        "IdentityServer4": "Information",
+        "IdentityServer4.Validation.TokenValidator": "Warning"
+      }
+    }
+  }
+}
 ```
 
-After configuring the settings for each environment, the logging needs to be applied to the Web Host Builder. Settings can be provided via a `LogConfig` object, or you can not provide one and settings will be read from your cofiguration file:
+To configure application insights and quick pulse metrics add the following code to your `Startup.cs`.
 
-```c#
-public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-	WebHost.CreateDefaultBuilder(args)
-		.UseKestrel(c => c.AddServerHeader = false)
-		.ConfigureLogging() // Add this line to read settings from your appsettings.json file.
-		.UseStartup<Startup>();
-```
+```csharp
+using Audacia.Log.AspNetCore;
 
-There is a similar extension method provided for configuring the logging service in your `Startup.cs`. Similarly, a `LogConfig` can be passed to this method if you don't want to specify settings in your configuration file.a
-It is recommended to call this method first in the chain so any subsequent errors that may occur are logged correctly.
+public IConfiguration Configuration { get; set; }
 
-```c#
 public void ConfigureServices(IServiceCollection services)
 {
-	services.ConfigureLogging();
+	services.ConfigureApplicationInsights(Configuration);
 }
 ```
 
@@ -41,19 +59,33 @@ public void ConfigureServices(IServiceCollection services)
 #### ActionLogFilter
 This filter can be registered to include logs for the beginning and end of each Action Method. The request parameters are included, as well as details of the response such as the type of model returned. Register it like so:
 
-```c#
-serviceCollection.AddMvcCore(x => x.Filters.Add<ActionLogFilterAttribute>());
+```csharp
+using Audacia.Log.AspNetCore;
+
+public IConfiguration Configuration { get; set; }
+
+public void ConfigureServices(IServiceCollection services)
+{
+	services.ConfigureActionContentLogging(Configuration);
+	services.AddControllers(x => x.Filters.Add<LogActionFilterAttribute>());
+}
 ```
+
 ##### Configure global request filtering
-To globally configure the logging of actions you must register a `ActionLogFilterConfig` for dependency injection.
+To globally configure the logging of actions you must add the `LogActionFilter` section to your `appsettings.json` file.
 This will allow the redaction of specific parameters from the request body during action logs.
 This is case insensitive and will filter out parameters that contain the provided words.
 For example using "Password" as the value will filter; Password, password, NewPassword, ConfirmPassword, etc.
-```c#
-serviceCollection.AddSingleton(_ => new ActionLogFilterConfig
+
+```json
 {
-    ExcludeArguments = new[] { "password", "token" }
-});
+  "LogActionFilter": {
+    "DisableBody": false,
+    "MaxDepth":  10,
+    "ExcludeArguments": [ "password", "token", "apikey" ],
+    "IncludeClaims": [ "client_id" ]
+  }
+}
 ```
 
 ##### Filtering specific requests
@@ -90,15 +122,4 @@ using Audacia.Log.AspNetCore;
 ...
 [LogFilter(MaxDepth = 3)]
 ...
-```
-
-#### HttpLogMiddleware
-This middleware can be used to log every HTTP request and response, with details of each included in the log context. **Its not recommended to use this with Application Insights because Application Insights has its own HTTP logging**.
-It can be registered in `Startup.cs` as follows:
-
-```c#
-public void Configure(IApplicationBuilder app)
-{
-	app.UseMiddleware<HttpLogMiddleware>();
-}
 ```

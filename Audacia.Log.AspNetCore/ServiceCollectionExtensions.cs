@@ -1,18 +1,21 @@
 using System;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
 namespace Audacia.Log.AspNetCore
 {
     /// <summary>Extension methods for configuring logging services for an ASP.NET Core application.</summary>
     public static class ServiceCollectionExtensions
     {
-        /// <summary>Configures logging for an ASP.NET Core application using the specified <see cref="AudaciaLoggerConfiguration"/>.</summary>
+        /// <summary>
+        /// Configures default application insights configuration and logging of request data.
+        /// </summary>
         /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
-        public static IServiceCollection ConfigureLogging(this IServiceCollection services, AudaciaLoggerConfiguration configuration, ILogger logger = null)
+        public static IServiceCollection ConfigureApplicationInsights(this IServiceCollection services, IConfiguration configuration)
         {
             if (services == null)
             {
@@ -24,39 +27,50 @@ namespace Audacia.Log.AspNetCore
                 throw new ArgumentNullException(nameof(configuration));
             }
 
-            services = services
-                .AddSingleton(logger ?? Serilog.Log.Logger)
-                .AddLogging(l => l.AddSerilog());
+            // Configure Application Insights, configuration will be pulled from the appsettings file
+            // see: https://docs.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core
+            services.AddApplicationInsightsTelemetry();
 
-            if (string.IsNullOrWhiteSpace(configuration.ApplicationInsightsKey))
+            // Live metrics stream is enabled by default, configure a secure control channel
+            // see: https://docs.microsoft.com/en-us/azure/azure-monitor/app/live-stream#secure-the-control-channel
+            var quickPulseKey = configuration.GetValue<string>("APPINSIGHTS_QUICKPULSEAUTHAPIKEY") ??
+                                configuration.GetValue<string>("ApplicationInsights:QuickPulseApiKey");
+
+            if (!string.IsNullOrWhiteSpace(quickPulseKey))
             {
-                configuration.ApplicationInsightsKey = Guid.Empty.ToString();
+                services.ConfigureTelemetryModule<QuickPulseTelemetryModule>((module, _) => module.AuthenticationApiKey = quickPulseKey);
             }
 
-            var options = new ApplicationInsightsServiceOptions
-            {
-                EnableAdaptiveSampling = configuration.EnableSampling,
-                InstrumentationKey = configuration.ApplicationInsightsKey
-            };
-
-            return services.AddApplicationInsightsTelemetry(options);
+            return services;
         }
 
-        /// <summary>Configures logging for an ASP.NET Core application using settings specified in appSettings.json file.</summary>
-#pragma warning disable CA1801 // Review unused parameters - publicly shipped API
-        public static IServiceCollection ConfigureLogging(this IServiceCollection services, string section = "Logging", ILogger logger = null)
-#pragma warning restore CA1801 // Review unused parameters
+        /// <summary>
+        /// Configures logging of the request body for all actions.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
+        public static IServiceCollection ConfigureActionContentLogging(this IServiceCollection services, IConfiguration configuration)
         {
-            var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
 
-            var webConfig = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{envName}.json", true)
-                .Build();
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
 
-            var logConfig = webConfig.LogConfig(section);
+            // Required for attaching the request telemetry to the HttpContext
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            return services.ConfigureLogging(logConfig);
+            // Configure global configuration for the LogActionFilter
+            services.Configure<LogActionFilterConfig>(configuration.GetSection("LogActionFilter"));
+
+            // Add telemetry initialiser to attach request data captured by LogActionFilter
+            services.AddSingleton<ITelemetryInitializer, LogActionTelemetryInitialiser>();
+
+            return services;
         }
     }
 }
