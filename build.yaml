@@ -10,7 +10,7 @@ stages:
     jobs:
       - template: pipelines/build/nuget-package.job.yaml@templates
         parameters:
-          releaseBranchName: release/v1
+          releaseBranchName: v1
 
   - stage: Release
     displayName: Release

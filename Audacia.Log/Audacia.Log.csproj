@@ -7,7 +7,6 @@
     <PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
     <PackageIcon>audacia-logo-circle-blue.png</PackageIcon>
     <PackageVersion>1.0.0</PackageVersion>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
