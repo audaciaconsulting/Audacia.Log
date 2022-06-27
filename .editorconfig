@@ -1,11 +1,15 @@
-# NOTE: Requires **VS2019 16.3** or later
+# NOTE: Requires **VS2022**
 
 # Default Rules
 # Description: CodeAnalysis.ruleset
 
+root = true
+
 # Code files
 [*.cs]
 
+# New files created with file-scoped namespaces
+csharp_style_namespace_declarations = file_scoped
 
 # Private fields should be prefixed with an underscore.
 dotnet_diagnostic.ACL1000.severity = warning
@@ -24,6 +28,21 @@ dotnet_diagnostic.ACL1004.severity = warning
 dotnet_diagnostic.ACL1004.exclude_lambdas = true
 dotnet_diagnostic.ACL1004.allowed_loop_variables = i,j
 
+# [NAMING] Asynchronous method name should be suffixed with 'Async' *** Suppress as covered by RCS1046; ACL1005 is only used in the AspNetCore ruleset ***
+dotnet_diagnostic.ACL1005.severity = none
+
+# [STYLE] Code block should have braces, excluding null argument checks
+dotnet_diagnostic.ACL1006.severity = warning
+
+# ACL1007: ThenByDescending follows OrderBy or OrderByDescending.
+dotnet_diagnostic.ACL1007.severity = suggestion
+
+# Controller action should have at least one ProducesResponseType attribute
+dotnet_diagnostic.ACL1008.severity = none
+
+# Method overload should call another overload
+dotnet_diagnostic.ACL1009.severity = none
+
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
 
@@ -37,7 +56,7 @@ dotnet_diagnostic.AV1010.severity = warning
 dotnet_diagnostic.AV1115.severity = warning
 
 # Return type in method signature should be a collection interface instead of a concrete type
-dotnet_diagnostic.AV1130.severity = warning
+dotnet_diagnostic.AV1130.severity = suggestion
 
 # Properties, arguments and return values representing strings, collections or tasks should never be `null`
 dotnet_diagnostic.AV1135.severity = warning
@@ -90,6 +109,12 @@ dotnet_diagnostic.AV1537.severity = none
 # Call the more overloaded method from other overloads
 dotnet_diagnostic.AV1551.severity = warning
 
+# Only use optional parameters to replace overloads
+dotnet_diagnostic.AV1553.severity = warning
+
+# Do not use optional parameters in interface methods or their concrete implementations
+dotnet_diagnostic.AV1554.severity = warning
+
 # Avoid using named arguments
 dotnet_diagnostic.AV1555.severity = none
 
@@ -97,13 +122,16 @@ dotnet_diagnostic.AV1555.severity = none
 dotnet_diagnostic.AV1561.severity = none
 
 # Don't use ref or out parameters
-dotnet_diagnostic.AV1562.severity = suggestion
+dotnet_diagnostic.AV1562.severity = warning
 
 # Avoid signatures that take a bool parameter
-dotnet_diagnostic.AV1564.severity = suggestion
+dotnet_diagnostic.AV1564.severity = warning
 
 # Don't use parameters as temporary variables
-dotnet_diagnostic.AV1568.severity = warning
+dotnet_diagnostic.AV1568.severity = suggestion
+
+# Write code that is easy to debug
+dotnet_diagnostic.AV1580.severity = suggestion
 
 # Don't include numbers in variables, parameters and type members
 dotnet_diagnostic.AV1704.severity = warning
@@ -112,7 +140,7 @@ dotnet_diagnostic.AV1704.severity = warning
 dotnet_diagnostic.AV1706.severity = none
 
 # Name types using nouns, noun phrases or adjective phrases
-dotnet_diagnostic.AV1708.severity = warning
+dotnet_diagnostic.AV1708.severity = suggestion
 
 # Don't repeat the name of a class or enumeration in its members
 dotnet_diagnostic.AV1710.severity = warning
@@ -262,7 +290,7 @@ dotnet_diagnostic.CA1060.severity = none
 dotnet_diagnostic.CA1061.severity = warning
 
 # [DESIGN] Validate arguments of public methods
-dotnet_diagnostic.CA1062.severity = warning
+dotnet_diagnostic.CA1062.severity = suggestion
 
 # [DESIGN] Implement IDisposable Correctly
 dotnet_diagnostic.CA1063.severity = warning
@@ -379,7 +407,7 @@ dotnet_diagnostic.CA1806.severity = warning
 dotnet_diagnostic.CA1810.severity = warning
 
 # [PERFORMANCE] Avoid uninstantiated internal classes
-dotnet_diagnostic.CA1812.severity = warning
+dotnet_diagnostic.CA1812.severity = suggestion
 
 # [PERFORMANCE] Avoid unsealed attributes
 dotnet_diagnostic.CA1813.severity = warning
@@ -426,8 +454,8 @@ dotnet_diagnostic.CA1828.severity = warning
 # [PERFORMANCE] Use Length/Count property instead of Count() when available
 dotnet_diagnostic.CA1829.severity = warning
 
-# [RELIABILITY] Dispose objects before losing scope
-dotnet_diagnostic.CA2000.severity = suggestion
+# [RELIABILITY] Dispose objects before losing scope *** Suppress as covered by IDISP004 ***
+dotnet_diagnostic.CA2000.severity = none
 
 # [RELIABILITY] Do not lock on objects with weak identity
 dotnet_diagnostic.CA2002.severity = warning
@@ -798,6 +826,15 @@ dotnet_diagnostic.DOC207.severity = warning
 # The documentation contains a `<see href="..."/>` element with an unrecognized URI.
 dotnet_diagnostic.DOC209.severity = warning
 
+# Use simple using statement
+dotnet_diagnostic.IDE0063.severity = warning
+
+# Use switch expression
+dotnet_diagnostic.IDE0066.severity = warning
+
+# Use file-scoped namespaces
+dotnet_diagnostic.IDE0161.severity = warning
+
 # Dispose created.
 dotnet_diagnostic.IDISP001.severity = warning
 
@@ -885,8 +922,8 @@ dotnet_diagnostic.RCS1005.severity = warning
 # [SIMPLIFICATION] Merge else clause with nested if statement
 dotnet_diagnostic.RCS1006.severity = warning
 
-# [STYLE] Add braces
-dotnet_diagnostic.RCS1007.severity = warning
+# [STYLE] Add braces *** Suppress as covered by ACL1006 ***
+dotnet_diagnostic.RCS1007.severity = none
 
 # [READABILITY] Use explicit type instead of 'var' (when the type is not obvious)
 dotnet_diagnostic.RCS1008.severity = none
@@ -915,17 +952,17 @@ dotnet_diagnostic.RCS1016.severity = suggestion
 # [STYLE] Avoid multiline expression body
 dotnet_diagnostic.RCS1017.severity = none
 
-# [READABILITY] Add default access modifier
-dotnet_diagnostic.RCS1018.severity = warning
+# [READABILITY] Add default access modifier *** Suppressed as covered by SA1400 ***
+dotnet_diagnostic.RCS1018.severity = none
 
-# [READABILITY] Order modifiers
-dotnet_diagnostic.RCS1019.severity = warning
+# [READABILITY] Order modifiers *** Suppressed as covered by SA1206 ***
+dotnet_diagnostic.RCS1019.severity = none
 
-# [SIMPLIFICATION] Simplify Nullable\<T> to T?
-dotnet_diagnostic.RCS1020.severity = warning
+# [SIMPLIFICATION] Simplify Nullable\<T> to T? *** Suppressed as covered by SA1125 ***
+dotnet_diagnostic.RCS1020.severity = none
 
 # [SIMPLIFICATION] Simplify lambda expression
-dotnet_diagnostic.RCS1021.severity = warning
+dotnet_diagnostic.RCS1021.severity = suggestion
 
 # [FORMATTING] Format empty block
 dotnet_diagnostic.RCS1023.severity = none
@@ -966,10 +1003,10 @@ dotnet_diagnostic.RCS1034.severity = warning
 # [REDUNDANCY] Remove redundant comma in initializer
 dotnet_diagnostic.RCS1035.severity = warning
 
-# [REDUNDANCY] Remove redundant empty line
-dotnet_diagnostic.RCS1036.severity = warning
+# [REDUNDANCY] Remove redundant empty line *** Suppressed as covered by SA1507 ***
+dotnet_diagnostic.RCS1036.severity = none
 
-# [REDUNDANCY] Remove trailing white-space *** Suppress as covered by SA1028 ***
+# [REDUNDANCY] Remove trailing white-space
 dotnet_diagnostic.RCS1037.severity = none
 
 # [REDUNDANCY] Remove empty statement
@@ -1233,8 +1270,8 @@ dotnet_diagnostic.RCS1151.severity = warning
 # [READABILITY] Sort enum members
 dotnet_diagnostic.RCS1154.severity = warning
 
-# [USAGE] Use StringComparison when comparing strings
-dotnet_diagnostic.RCS1155.severity = warning
+# [USAGE] Use StringComparison when comparing strings *** Suppress as covered by CA1304 and CA1307 ***
+dotnet_diagnostic.RCS1155.severity = none
 
 # [USAGE] Use string.Length instead of comparison with empty string *** Suppress as covered by CA1820 ***
 dotnet_diagnostic.RCS1156.severity = none
@@ -1257,7 +1294,7 @@ dotnet_diagnostic.RCS1161.severity = suggestion
 # [READABILITY] Avoid chain of assignments
 dotnet_diagnostic.RCS1162.severity = warning
 
-# [REDUNDANCY] Unused parameter
+# [REDUNDANCY] Unused parameter *** Suppress as covered by CA1801 ***
 dotnet_diagnostic.RCS1163.severity = none
 
 # [REDUNDANCY] Unused type parameter
@@ -1287,8 +1324,8 @@ dotnet_diagnostic.RCS1172.severity = warning
 # [SIMPLIFICATION] Use coalesce expression instead of if
 dotnet_diagnostic.RCS1173.severity = warning
 
-# [REDUNDANCY] Remove redundant async/await
-dotnet_diagnostic.RCS1174.severity = warning
+# [REDUNDANCY] Remove redundant async/await *** Suppressed as not considered best practice (see https://blog.stephencleary.com/2016/12/eliding-async-await.html) ***
+dotnet_diagnostic.RCS1174.severity = none
 
 # [REDUNDANCY] Unused this parameter
 dotnet_diagnostic.RCS1175.severity = suggestion
@@ -1684,7 +1721,7 @@ dotnet_diagnostic.SA1026.severity = warning
 dotnet_diagnostic.SA1027.severity = none
 
 # A line of code ends with a space, tab, or other whitespace characters before the end of line character(s).
-dotnet_diagnostic.SA1028.severity = suggestion
+dotnet_diagnostic.SA1028.severity = none
 
 # A call to a member from an inherited class begins with `base.`, and the local class does not contain an override or implementation of the member.
 dotnet_diagnostic.SA1100.severity = warning
@@ -1743,8 +1780,8 @@ dotnet_diagnostic.SA1117.severity = suggestion
 # A parameter to a C# method or indexer, other than the first parameter, spans across multiple lines.
 dotnet_diagnostic.SA1118.severity = warning
 
-# A C# statement contains parenthesis which are unnecessary and should be removed.
-dotnet_diagnostic.SA1119.severity = warning
+# A C# statement contains parenthesis which are unnecessary and should be removed. *** Suppress as redundant parentheses can add structure that makes code more readable ***
+dotnet_diagnostic.SA1119.severity = none
 
 # The C# comment does not contain any comment text.
 dotnet_diagnostic.SA1120.severity = warning
@@ -2178,108 +2215,96 @@ dotnet_diagnostic.SA1651.severity = suggestion
 # This rule was moved to [SA0001](SA0001.md)
 dotnet_diagnostic.SA1652.severity = none
 
-# Injection
-# [SECURITY] The dynamic value passed to the command execution should be validated.
+# [SECURITY] Command Injection
 dotnet_diagnostic.SCS0001.severity = warning
 
-# SQL Injection
-# [SECURITY] Unsafe usage of System.Web.UI.WebControls.SqlDataSource, System.Web.UI.WebControls.SqlDataSourceView or Microsoft.Whos.Framework.Data.SqlUtility.
+# [SECURITY] SQL Injection
 dotnet_diagnostic.SCS0002.severity = warning
 
-# [SECURITY] The dynamic value passed to the XPath query should be validated.
+# [SECURITY] XPath Injection
 dotnet_diagnostic.SCS0003.severity = warning
 
-# Cryptography
-# [SECURITY] Certificate Validation has been disabled. The communication could be intercepted.
+# [SECURITY] Certificate Validation Disabled
 dotnet_diagnostic.SCS0004.severity = warning
 
-# [SECURITY] The random numbers generated could be predicted.
+# [SECURITY] Weak Random Number Generator
 dotnet_diagnostic.SCS0005.severity = none
 
-# [SECURITY] MD5 or SHA1 have known collision weaknesses and are no longer considered strong hashing algorithms.
+# [SECURITY] Weak Hashing Function
 dotnet_diagnostic.SCS0006.severity = warning
 
-# [SECURITY] The XML parser is configured incorrectly. The operation could be vulnerable to XML eXternal Entity (XXE) processing.
+# [SECURITY] XML eXternal Entity Injection (XXE)
 dotnet_diagnostic.SCS0007.severity = warning
 
-# Cookies
-# [SECURITY] It is recommended to specify the Secure flag to new cookie.
+# [SECURITY] Cookie Without SSL Flag
 dotnet_diagnostic.SCS0008.severity = warning
 
-# [SECURITY] It is recommended to specify the HttpOnly flag to new cookie.
+# [SECURITY] Cookie Without HttpOnly Flag
 dotnet_diagnostic.SCS0009.severity = warning
 
-# [SECURITY] DES and 3DES are not considered a strong cipher for modern applications. Currently, NIST recommends the usage of AES block ciphers instead.
+# [SECURITY] Weak cipher algorithm
 dotnet_diagnostic.SCS0010.severity = warning
 
-# [SECURITY] The CBC mode alone is susceptible to padding oracle attack.
+# [SECURITY] Unsafe XSLT setting used
 dotnet_diagnostic.SCS0011.severity = warning
 
-# [SECURITY] ECB mode will produce the same result for identical blocks (ie: 16 bytes for AES). An attacker could be able to guess the encrypted message. The use of AES in CBC mode with a HMAC is recommended guaranteeing integrity and confidentiality.
+# [SECURITY] Controller method is potentially vulnerable to authorization bypass
+# NOTE: This can be disabled if there is a fallback authorization policy set to require an authentication user
 dotnet_diagnostic.SCS0012.severity = warning
 
-# [SECURITY] The cipher text produced is susceptible to alteration by an adversary.
+# [SECURITY] Potential usage of weak CipherMode mode
 dotnet_diagnostic.SCS0013.severity = warning
 
-# [SECURITY] Unsafe usage of System.Web.UI.WebControls.SqlDataSource, System.Web.UI.WebControls.SqlDataSourceView or Microsoft.Whos.Framework.Data.SqlUtility.
-dotnet_diagnostic.SCS0014.severity = warning
-
-# Password Management
-# [SECURITY] The password configuration to this API appears to be hardcoded.
+# [SECURITY] Hardcoded Password
 dotnet_diagnostic.SCS0015.severity = warning
 
-# Request Validation
-# [SECURITY] Controller method is vulnerable to CSRF.
+# [SECURITY] Cross-Site Request Forgery (CSRF)
 dotnet_diagnostic.SCS0016.severity = warning
 
-# [SECURITY] Request validation is disabled. Request validation allows the filtering of some XSS patterns submitted to the application.
+# [SECURITY] Request Validation Disabled (Attribute)
 dotnet_diagnostic.SCS0017.severity = warning
 
-# [SECURITY] A path traversal attack (also known as directory traversal) aims to access files and directories that are stored outside the expected directory.By manipulating variables that reference files with “dot-dot-slash (../)” sequences and its variations or by using absolute file paths, it may be possible to access arbitrary files and directories stored on file system including application source code or configuration and critical system files.
+# [SECURITY] Path Traversal
 dotnet_diagnostic.SCS0018.severity = warning
 
-# [SECURITY] Use parametrized queries to mitigate SQL injection.
-dotnet_diagnostic.SCS0020.severity = warning
+# [SECURITY] OutputCache Conflict
+dotnet_diagnostic.SCS0019.severity = warning
 
-# [SECURITY] The validateRequest which provides additional protection against XSS is disabled in configuration file.
+# [SECURITY] Request Validation Disabled (Configuration File)
 dotnet_diagnostic.SCS0021.severity = warning
 
-# View State
-# [SECURITY] The viewStateEncryptionMode is not set to Always in configuration file.
+# [SECURITY] Event Validation Disabled
+dotnet_diagnostic.SCS0022.severity = warning
+
+# [SECURITY] View State Not Encrypted
 dotnet_diagnostic.SCS0023.severity = warning
 
-# [SECURITY] The enableViewStateMac is disabled in configuration file. (This feature cannot be disabled starting .NET 4.5.1)
+# [SECURITY] View State MAC Disabled
 dotnet_diagnostic.SCS0024.severity = warning
 
-# [SECURITY] Use parametrized queries to mitigate SQL injection.
-dotnet_diagnostic.SCS0025.severity = warning
-
-# [SECURITY] Use parametrized queries to mitigate SQL injection.
+# [SECURITY] LDAP Distinguished Name Injection
 dotnet_diagnostic.SCS0026.severity = warning
 
-# [SECURITY] Open redirect: possibly unvalidated input in 1st argument passed to 'Redirect'.
+# [SECURITY] Open Redirect
 dotnet_diagnostic.SCS0027.severity = warning
 
-# [SECURITY] A potential XSS was found. The endpoint returns a variable from the client input that has not been encoded. To protect against stored XSS attacks, make sure any dynamic content coming from user or data store cannot be used to inject JavaScript on a page. Most modern frameworks will escape dynamic content by default automatically (Razor for example) or by using special syntax (<%: content %>, <%= HttpUtility.HtmlEncode(content) %>).
+# [SECURITY] Insecure Deserialization
+dotnet_diagnostic.SCS0028.severity = warning
+
+# [SECURITY] Cross-Site Scripting (XSS)
 dotnet_diagnostic.SCS0029.severity = warning
 
-# [SECURITY] The requestValidationMode which provides additional protection against XSS is enabled only for pages, not for all HTTP requests in configuration file.
+# [SECURITY] Request validation is enabled only for pages (Configuration File)
 dotnet_diagnostic.SCS0030.severity = warning
 
-# [SECURITY] The dynamic value passed to the LDAP query should be validated.
+# [SECURITY] LDAP Filter Injection
 dotnet_diagnostic.SCS0031.severity = warning
 
-# [SECURITY] The minimal length of a password is recommended to be set at least to 8.
+# [SECURITY] Password RequiredLength Too Small
 dotnet_diagnostic.SCS0032.severity = warning
 
-# [SECURITY] PasswordValidator should have at least two requirements for better security (RequiredLength, RequireDigit, RequireLowercase, RequireUppercase and/or RequireNonLetterOrDigit).
+# [SECURITY] Password Complexity
 dotnet_diagnostic.SCS0033.severity = warning
 
-# [SECURITY] The RequiredLength property must be set with a minimum value of 8.
+# [SECURITY] Password RequiredLength Not Set
 dotnet_diagnostic.SCS0034.severity = warning
-
-# [SECURITY] Use parametrized queries to mitigate SQL injection.
-dotnet_diagnostic.SCS0035.severity = warning
-
-# [SECURITY] Use parametrized queries to mitigate SQL injection.
-dotnet_diagnostic.SCS0036.severity = warning
