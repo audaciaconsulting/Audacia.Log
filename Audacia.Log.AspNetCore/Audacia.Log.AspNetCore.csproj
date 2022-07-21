@@ -8,6 +8,7 @@
     <PackageIcon>audacia-logo-circle-blue.png</PackageIcon>
     <PackageVersion>2.1.0</PackageVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
