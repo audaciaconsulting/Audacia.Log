@@ -30,7 +30,7 @@ namespace Audacia.Log.AspNetCore
         };
 
         /// <summary>
-        /// Gets or sets the max depth for desconstructing objects in the request body.
+        /// Gets or sets the max depth for deconstructing objects in the request body.
         /// </summary>
         public int MaxDepth { get; set; } = 32;
 
@@ -43,7 +43,7 @@ namespace Audacia.Log.AspNetCore
         /// Initializes a new instance of the <see cref="LogActionFilterAttribute"/> class.
         /// Creates a new instance of <see cref="ActionFilterAttribute"/>.
         /// </summary>
-        /// <param name="options">Global log filter configuration</param>
+        /// <param name="options">Global log filter configuration.</param>
 #pragma warning disable CA1019 // Define accessors for attribute arguments
         public LogActionFilterAttribute(IOptions<LogActionFilterConfig> options)
 #pragma warning restore CA1019 // Define accessors for attribute arguments
@@ -56,15 +56,18 @@ namespace Audacia.Log.AspNetCore
         public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var httpContext = context?.HttpContext;
-            if (httpContext?.HasFormData() == true)
+
+            if (httpContext != default)
             {
-                // Apply action specific log filters
                 Configure(GetControllerActionFilter(context));
 
                 AddUserInfo(httpContext.User, httpContext);
 
                 AddClaims(httpContext.User, httpContext);
+            }
 
+            if (httpContext?.HasFormData() == true)
+            {
                 AddBodyContent(context, httpContext);
             }
 

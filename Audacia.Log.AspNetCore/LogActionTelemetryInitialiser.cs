@@ -35,13 +35,18 @@ namespace Audacia.Log.AspNetCore
         /// <inheritdoc/>
         public void Initialize(ITelemetry telemetry)
         {
-            // Add RequestTelemetry to the HttpContext so that the request body can be appended
-            if ((telemetry is RequestTelemetry requestTelemetry) &&
-                _httpContextAccessor.HttpContext?.HasFormData() == true)
+            // Only add logs to RequestTelemetry
+            if (telemetry is not RequestTelemetry requestTelemetry)
             {
-                TryAddProperty(requestTelemetry, "UserId", ActionUserId);
-                TryAddProperty(requestTelemetry, "UserRoles", ActionUserRoles);
-                TryAddProperty(requestTelemetry, "UserClaims", ActionClaims);
+                return;
+            }
+            
+            TryAddProperty(requestTelemetry, "UserId", ActionUserId);
+            TryAddProperty(requestTelemetry, "UserRoles", ActionUserRoles);
+            TryAddProperty(requestTelemetry, "UserClaims", ActionClaims);
+
+            if (_httpContextAccessor.HttpContext?.HasFormData() == true)
+            {
                 TryAddProperty(requestTelemetry, "Arguments", ActionArguments);
             }
         }
