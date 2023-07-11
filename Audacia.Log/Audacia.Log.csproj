@@ -1,13 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Authors>Audacia</Authors>
     <Description>Standardized SeriLog logging configuration for Audacia projects.</Description>
-    <Copyright>Copyright © Audacia 2019</Copyright>
-    <PackageIconUrl>https://www.audacia.co.uk/media/pkenoobu/audacia-logo-circle-blue.png</PackageIconUrl>
-    <PackageIcon>audacia-logo-circle-blue.png</PackageIcon>
-    <PackageVersion>1.0.0</PackageVersion>
+    <Copyright>Copyright © Audacia 2020</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageIcon>package-icon.png</PackageIcon>
+    <PackageVersion>1.1.0</PackageVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -20,11 +23,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Audacia.CodeAnalysis" Version="1.3.0">
+    <PackageReference Include="Audacia.CodeAnalysis" Version="1.5.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Audacia.CodeAnalysis.Analyzers.Helpers" Version="1.0.20216.1" />
+    <PackageReference Include="Audacia.CodeAnalysis.Analyzers.Helpers" Version="1.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Enrichers.AssemblyName" Version="1.0.9" />
@@ -37,7 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="audacia-logo-circle-blue.png" Pack="true" PackagePath="\" />
+    <None Include="..\package-icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
