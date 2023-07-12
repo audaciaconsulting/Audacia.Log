@@ -5,59 +5,58 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
 
-namespace Audacia.Log.AspNetCore
+namespace Audacia.Log.AspNetCore;
+
+/// <summary>
+/// Attaches request content stored on the <see cref="HttpContext"/> to <see cref="RequestTelemetry"/>.
+/// </summary>
+public sealed class LogActionTelemetryInitialiser : ITelemetryInitializer
 {
+    internal const string ActionArguments = "ActionArguments";
+
+    internal const string ActionClaims = "ActionClaims";
+
+    internal const string ActionUserId = "ActionUserId";
+
+    internal const string ActionUserRoles = "ActionUserRoles";
+
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
     /// <summary>
-    /// Attaches request content stored on the <see cref="HttpContext"/> to <see cref="RequestTelemetry"/>.
+    /// Creates an instance of RequestDataTelemetryInitialiser.
     /// </summary>
-    public sealed class LogActionTelemetryInitialiser : ITelemetryInitializer
+    /// <param name="httpContextAccessor">Http context accessor</param>
+    public LogActionTelemetryInitialiser(IHttpContextAccessor httpContextAccessor)
     {
-        internal const string ActionArguments = "ActionArguments";
+        _httpContextAccessor = httpContextAccessor ??
+            throw new ArgumentNullException(nameof(httpContextAccessor));
+    }
 
-        internal const string ActionClaims = "ActionClaims";
-
-        internal const string ActionUserId = "ActionUserId";
-
-        internal const string ActionUserRoles = "ActionUserRoles";
-
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        /// <summary>
-        /// Creates an instance of RequestDataTelemetryInitialiser.
-        /// </summary>
-        /// <param name="httpContextAccessor">Http context accessor</param>
-        public LogActionTelemetryInitialiser(IHttpContextAccessor httpContextAccessor)
+    /// <inheritdoc/>
+    public void Initialize(ITelemetry telemetry)
+    {
+        // Only add logs to RequestTelemetry
+        if (telemetry is not RequestTelemetry requestTelemetry)
         {
-            _httpContextAccessor = httpContextAccessor ??
-                throw new ArgumentNullException(nameof(httpContextAccessor));
+            return;
         }
+        
+        TryAddProperty(requestTelemetry, "UserId", ActionUserId);
+        TryAddProperty(requestTelemetry, "UserRoles", ActionUserRoles);
+        TryAddProperty(requestTelemetry, "UserClaims", ActionClaims);
 
-        /// <inheritdoc/>
-        public void Initialize(ITelemetry telemetry)
+        if (_httpContextAccessor.HttpContext?.HasFormData() == true)
         {
-            // Only add logs to RequestTelemetry
-            if (telemetry is not RequestTelemetry requestTelemetry)
-            {
-                return;
-            }
-            
-            TryAddProperty(requestTelemetry, "UserId", ActionUserId);
-            TryAddProperty(requestTelemetry, "UserRoles", ActionUserRoles);
-            TryAddProperty(requestTelemetry, "UserClaims", ActionClaims);
-
-            if (_httpContextAccessor.HttpContext?.HasFormData() == true)
-            {
-                TryAddProperty(requestTelemetry, "Arguments", ActionArguments);
-            }
+            TryAddProperty(requestTelemetry, "Arguments", ActionArguments);
         }
+    }
 
-        private void TryAddProperty(RequestTelemetry telemetry, string propertyName, string httpContextItemKey)
+    private void TryAddProperty(RequestTelemetry telemetry, string propertyName, string httpContextItemKey)
+    {
+        if (_httpContextAccessor.HttpContext.Items.ContainsKey(httpContextItemKey))
         {
-            if (_httpContextAccessor.HttpContext.Items.ContainsKey(httpContextItemKey))
-            {
-                var logPropertyData = _httpContextAccessor.HttpContext.Items[httpContextItemKey].ToString();
-                telemetry.Properties.Add(propertyName, logPropertyData);
-            }
+            var logPropertyData = _httpContextAccessor.HttpContext.Items[httpContextItemKey].ToString();
+            telemetry.Properties.Add(propertyName, logPropertyData);
         }
     }
 }
