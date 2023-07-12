@@ -10,7 +10,6 @@
     <PackageIcon>package-icon.png</PackageIcon>
     <PackageVersion>0.2.0</PackageVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Audacia</Authors>
     <Description>Standardized SeriLog logging configuration for Audacia projects.</Description>
     <Copyright>Copyright © Audacia 2020</Copyright>
@@ -10,7 +10,6 @@
     <PackageIcon>package-icon.png</PackageIcon>
     <PackageVersion>1.1.0</PackageVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
