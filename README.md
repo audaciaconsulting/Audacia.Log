@@ -5,4 +5,4 @@ This repository contains 3 packages for implementing logging into your applicati
 - **Audacia.Log** and **Audacia.Log.Net4** are for legacy applications only.
 
 # Contributing
-We welcome contributions! Please feel free to check our Contribution Guidlines  for feature requests, issue reporting and guidelines.
+We welcome contributions! Please feel free to check our [Contribution Guidlines](https://github.com/audaciaconsulting/.github/blob/main/CONTRIBUTING.md) for feature requests, issue reporting and guidelines.
