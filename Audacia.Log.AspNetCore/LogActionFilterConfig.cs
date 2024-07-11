@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 namespace Audacia.Log.AspNetCore;
 
 /// <summary>
-/// Allows the configuration of the <see cref="LogActionFilterAttribute"/> per request.
+/// Allows the configuration of the <see cref="LogClaimsActionFilterAttribute "/> and <see cref="LogRequestBodyActionFilterAttribute "/> per request.
 /// </summary>
 public sealed class LogActionFilterConfig
 {
@@ -27,4 +27,14 @@ public sealed class LogActionFilterConfig
     /// Gets or sets the max depth for desconstructing objects in the request body.
     /// </summary>
     public int MaxDepth { get; set; }
+
+    /// <summary>
+    /// Gets or sets id claim name.
+    /// </summary>
+    public string IdClaimType { get; set; } = "sub";
+
+    /// <summary>
+    /// Gets or sets role claim name.
+    /// </summary>
+    public string RoleClaimType { get; set; } = "role";
 }

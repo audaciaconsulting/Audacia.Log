@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace Audacia.Log.AspNetCore;
 
 /// <summary>
-/// Allows the configuration of the <see cref="LogActionFilterAttribute"/> per request.
+/// Allows the configuration of the <see cref="LogClaimsActionFilterAttribute "/> and <see cref="LogRequestBodyActionFilterAttribute "/> per request.
 /// </summary>
 /// <example>
 /// To use place above a controller action and specify one or more parameters.

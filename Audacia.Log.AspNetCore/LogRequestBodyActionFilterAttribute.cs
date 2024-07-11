@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -15,21 +16,8 @@ namespace Audacia.Log.AspNetCore;
 /// <summary>
 /// Attaches request content for each controller action to the <see cref="HttpContext"/> to be used later by Application Insights Telemetry.
 /// </summary>
-public sealed class LogActionFilterAttribute : ActionFilterAttribute
+public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
 {
-    /// <summary>Gets the names of claims to include in the logs. If empty, no claims are included.</summary>
-    public ICollection<string> IncludeClaims { get; } = new HashSet<string>();
-
-    /// <summary>Gets the names of arguments to exclude from the logs.</summary>
-    public ICollection<string> ExcludeArguments { get; } = new HashSet<string>
-    {
-        "username",
-        "password",
-        "email",
-        "token",
-        "bearer"
-    };
-
     /// <summary>
     /// Gets or sets the max depth for deconstructing objects in the request body.
     /// </summary>
@@ -40,16 +28,24 @@ public sealed class LogActionFilterAttribute : ActionFilterAttribute
     /// </summary>
     public bool DisableBodyContent { get; set; }
 
+    /// <summary>Gets the names of arguments to exclude from the logs.</summary>
+    public ICollection<string> ExcludeArguments { get; } =
+    [
+        "username",
+        "password",
+        "email",
+        "token",
+        "bearer"
+    ];
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="LogActionFilterAttribute"/> class.
+    /// Initializes a new instance of the <see cref="LogRequestBodyActionFilterAttribute"/> class.
     /// Creates a new instance of <see cref="ActionFilterAttribute"/>.
     /// </summary>
     /// <param name="options">Global log filter configuration.</param>
-#pragma warning disable CA1019 // Define accessors for attribute arguments
-    public LogActionFilterAttribute(IOptions<LogActionFilterConfig> options)
-#pragma warning restore CA1019 // Define accessors for attribute arguments
+    [SuppressMessage("Design", "CA1019:Define accessors for attribute arguments", Justification = "Options does not need to a corresponding property.")]
+    public LogRequestBodyActionFilterAttribute(IOptions<LogActionFilterConfig> options) 
     {
-        // Apply global log filters
         Configure(options?.Value);
     }
 
@@ -58,13 +54,9 @@ public sealed class LogActionFilterAttribute : ActionFilterAttribute
     {
         var httpContext = context?.HttpContext;
 
-        if (httpContext != default)
+        if (httpContext != default) 
         {
             Configure(GetControllerActionFilter(context!));
-
-            AddUserInfo(httpContext.User, httpContext);
-
-            AddClaims(httpContext.User, httpContext);
         }
 
         if (httpContext?.HasFormData() == true)
@@ -79,9 +71,7 @@ public sealed class LogActionFilterAttribute : ActionFilterAttribute
     /// Applies configuration to the log filter if provided.
     /// </summary>
     /// <param name="config">global or action config.</param>
-#pragma warning disable ACL1002 // Member or local function contains too many statements
-    private void Configure(LogActionFilterConfig? config)
-#pragma warning restore ACL1002 // Member or local function contains too many statements
+    private void Configure(LogActionFilterConfig? config) 
     {
         if (config == null)
         {
@@ -104,16 +94,6 @@ public sealed class LogActionFilterAttribute : ActionFilterAttribute
 
             ExcludeArguments.Add(item);
         }
-
-        foreach (var item in config.IncludeClaims ?? Enumerable.Empty<string>())
-        {
-            if (IncludeClaims.Contains(item, StringComparer.InvariantCultureIgnoreCase))
-            {
-                continue;
-            }
-
-            IncludeClaims.Add(item);
-        }
     }
 
     private void AddBodyContent(ActionExecutingContext context, HttpContext httpContext)
@@ -125,43 +105,7 @@ public sealed class LogActionFilterAttribute : ActionFilterAttribute
 
         if (arguments.Any())
         {
-            httpContext.Items.Add(LogActionTelemetryInitialiser.ActionArguments, arguments);
-        }
-    }
-
-    private void AddClaims(IPrincipal principal, HttpContext httpContext)
-    {
-        if (principal?.Identity?.IsAuthenticated != true) { return; }
-
-        if (!(principal.Identity is ClaimsIdentity identity)) { return; }
-
-        var claims = identity.Claims
-            .Where(claim => IncludeClaims.Contains(claim.Subject.Name))
-            .Select(claim => $"\"{claim.Subject.Name}\": \"{claim.Value}\"")
-            .ToArray();
-
-        if (claims.Any())
-        {
-            httpContext.Items.Add(LogActionTelemetryInitialiser.ActionClaims, $"{{ {string.Join(", ", claims)} }}");
-        }
-    }
-
-    private static void AddUserInfo(IPrincipal principal, HttpContext httpContext)
-    {
-        if (principal?.Identity?.IsAuthenticated != true) { return; }
-
-        if (!(principal.Identity is ClaimsIdentity identity)) { return; }
-
-        var userId = identity.FindFirst("sub")?.Value;
-        if (!string.IsNullOrEmpty(userId))
-        {
-            httpContext.Items.Add(LogActionTelemetryInitialiser.ActionUserId, userId);
-        }
-
-        var userRoles = identity.FindAll("role").Select(c => c.Value);
-        if (userRoles.Any()) 
-        {
-            httpContext.Items.Add(LogActionTelemetryInitialiser.ActionUserRoles, string.Join(", ", userRoles));
+            httpContext.Items.Add(LogRequestBodyActionTelemetryInitialiser.ActionArguments, arguments);
         }
     }
 
@@ -173,10 +117,9 @@ public sealed class LogActionFilterAttribute : ActionFilterAttribute
             .OfType<LogFilterAttribute>()
             .Select(attribute => new LogActionFilterConfig
             {
-                DisableBodyContent = attribute.DisableBodyContent,
                 ExcludeArguments = attribute.ExcludeArguments,
-                IncludeClaims = attribute.IncludeClaims,
-                MaxDepth = attribute.MaxDepth
+                MaxDepth = attribute.MaxDepth,
+                DisableBodyContent = attribute.DisableBodyContent
             })
             .FirstOrDefault();
     }
