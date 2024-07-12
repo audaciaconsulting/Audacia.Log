@@ -6,10 +6,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Audacia.Log.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Options;
 
 namespace Audacia.Log.AspNetCore;
@@ -35,12 +33,12 @@ public sealed class LogClaimsActionFilterAttribute : ActionFilterAttribute
     /// <summary>
     /// Gets or sets id claim name.
     /// </summary>
-    public string IdClaimName { get; set; } = "sub";
+    public string IdClaimName { get; set; } = ClaimTypes.Sub;
 
     /// <summary>
     /// Gets or sets role claim name.
     /// </summary>
-    public string RoleClaimName { get; set; } = "role";
+    public string RoleClaimName { get; set; } = ClaimTypes.Role;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LogClaimsActionFilterAttribute"/> class.
@@ -151,7 +149,7 @@ public sealed class LogClaimsActionFilterAttribute : ActionFilterAttribute
         }
     }
 
-    private static LogActionFilterConfig GetControllerActionFilter(ActionExecutingContext context)
+    private static LogActionFilterConfig? GetControllerActionFilter(ActionExecutingContext context)
     {
         // Get attribute for per request configuration
         return context.ActionDescriptor.FilterDescriptors

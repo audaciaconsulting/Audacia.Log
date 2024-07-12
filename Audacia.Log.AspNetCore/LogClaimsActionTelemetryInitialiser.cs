@@ -50,9 +50,9 @@ public sealed class LogClaimsActionTelemetryInitialiser : ITelemetryInitializer
 
         if (_additionalClaimsTelemetryProvider != null) 
         {
-            foreach (var (name, data) in _additionalClaimsTelemetryProvider.GetClaims(_httpContextAccessor)) 
+            foreach (var claimsData in _additionalClaimsTelemetryProvider.GetClaims(_httpContextAccessor.HttpContext.User.Claims)) 
             {
-                requestTelemetry.Properties.Add(name, data);
+                requestTelemetry.Properties.Add(claimsData.Type, claimsData.Data);
             }
         }
     }

@@ -92,8 +92,7 @@ public static class ServiceCollectionExtensions
     /// This will inject <see cref="IAdditionalClaimsTelemetryProvider" /> and <see cref="LogClaimsActionTelemetryInitialiser" />.
     /// </summary>
     /// <param name="services"></param>
-    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Spacing Rules", "SA1010:Opening Square Brackets Must Be Spaced Correctly", Justification = "This is an easy way to create an empty array.")]
+    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>    
     public static IServiceCollection AddClaimsTelemetry(this IServiceCollection services) 
     {
         if (services == null)
@@ -110,7 +109,6 @@ public static class ServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="additionalClaimsTelemetryProvider"></param>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Spacing Rules", "SA1010:Opening Square Brackets Must Be Spaced Correctly", Justification = "This is an easy way to create an empty array.")]
     public static IServiceCollection AddClaimsTelemetry(this IServiceCollection services, IAdditionalClaimsTelemetryProvider additionalClaimsTelemetryProvider)
     {
         if (services == null)

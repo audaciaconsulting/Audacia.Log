@@ -18,12 +18,12 @@ public sealed class LogFilterAttribute : Attribute, IFilterMetadata
     /// <summary>
     /// Gets or sets the names of arguments to exclude from the logs.
     /// </summary>
-    public string[] ExcludeArguments { get; set; } = Array.Empty<string>();
+    public string[] ExcludeArguments { get; set; } = [];
 
     /// <summary>
     /// Gets or sets the names of claims to include in the logs.
     /// </summary>
-    public string[] IncludeClaims { get; set; } = Array.Empty<string>();
+    public string[] IncludeClaims { get; set; } = [];
 
     /// <summary>
     /// Gets or sets a value indicating whether the request body data should be logged.

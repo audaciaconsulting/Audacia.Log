@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 
 namespace Audacia.Log.AspNetCore;
 
@@ -10,13 +9,13 @@ namespace Audacia.Log.AspNetCore;
 /// </summary>
 public class CustomAdditionalClaimsTelemetryProvider : IAdditionalClaimsTelemetryProvider
 {
-    private readonly Func<ClaimsPrincipal, List<(string, string)>> _claimsGetter;
+    private readonly Func<IEnumerable<Claim>, List<ClaimsData>> _claimsGetter;
 
     /// <summary>
     /// Initialise the claimsGetter Func.
     /// </summary>
     /// <param name="claimsGetter"></param>
-    public CustomAdditionalClaimsTelemetryProvider(Func<ClaimsPrincipal, List<(string Name, string Data)>> claimsGetter)
+    public CustomAdditionalClaimsTelemetryProvider(Func<IEnumerable<Claim>, List<ClaimsData>> claimsGetter)
     {
         _claimsGetter = claimsGetter;
     }
@@ -24,16 +23,11 @@ public class CustomAdditionalClaimsTelemetryProvider : IAdditionalClaimsTelemetr
     /// <summary>
     /// Gets additional claims.
     /// </summary>
-    /// <param name="httpContextAccessor"><see cref="IHttpContextAccessor"/>.</param>
+    /// <param name="claims">User claims <see cref="Claim"/> collection.</param>
     /// <returns>List of Tuples(Name,Data).</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public List<(string Name, string Data)> GetClaims(IHttpContextAccessor httpContextAccessor)
+    public List<ClaimsData> GetClaims(IEnumerable<Claim> claims)
     {
-        if (httpContextAccessor == null || httpContextAccessor.HttpContext == null) 
-        {
-            throw new ArgumentNullException(nameof(httpContextAccessor));
-        }
-
-        return _claimsGetter(httpContextAccessor.HttpContext.User);
+       return _claimsGetter(claims);
     }
 }

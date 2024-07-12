@@ -31,10 +31,10 @@ public sealed class LogActionFilterConfig
     /// <summary>
     /// Gets or sets id claim name.
     /// </summary>
-    public string IdClaimType { get; set; } = "sub";
+    public string IdClaimType { get; set; } = ClaimTypes.Sub;
 
     /// <summary>
     /// Gets or sets role claim name.
     /// </summary>
-    public string RoleClaimType { get; set; } = "role";
+    public string RoleClaimType { get; set; } = ClaimTypes.Role;
 }

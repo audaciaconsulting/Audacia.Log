@@ -1,18 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.Log", "Audacia.Log\Audacia.Log.csproj", "{D9274A98-3F2E-4EFD-8050-F6C95C144D73}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Log", "Audacia.Log\Audacia.Log.csproj", "{D9274A98-3F2E-4EFD-8050-F6C95C144D73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.Log.AspNetCore", "Audacia.Log.AspNetCore\Audacia.Log.AspNetCore.csproj", "{4D38A980-41A0-4E9D-B01A-74E214156679}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Log.AspNetCore", "Audacia.Log.AspNetCore\Audacia.Log.AspNetCore.csproj", "{4D38A980-41A0-4E9D-B01A-74E214156679}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.Log.AspNet4", "Audacia.Log.AspNet4\Audacia.Log.AspNet4.csproj", "{7E55694A-7FE2-4E88-A0C2-132AF27F31BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Log.AspNet4", "Audacia.Log.AspNet4\Audacia.Log.AspNet4.csproj", "{7E55694A-7FE2-4E88-A0C2-132AF27F31BE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A51E1C35-5B0C-46A5-BE5E-A4C7D67DA5DA}"
-ProjectSection(SolutionItems) = preProject
-	README.md = README.md
-	build.yaml = build.yaml
-	CodeAnalysis.ruleset = CodeAnalysis.ruleset
-	.gitignore = .gitignore
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		build.yaml = build.yaml
+		CodeAnalysis.ruleset = CodeAnalysis.ruleset
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audacia.Log.AspNetCore.Tests", "Audacia.Log.AspNetCore.Tests\Audacia.Log.AspNetCore.Tests.csproj", "{AC8A888E-E142-46B0-B34F-88F7142F7180}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,5 +37,15 @@ Global
 		{7E55694A-7FE2-4E88-A0C2-132AF27F31BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E55694A-7FE2-4E88-A0C2-132AF27F31BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E55694A-7FE2-4E88-A0C2-132AF27F31BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC8A888E-E142-46B0-B34F-88F7142F7180}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC8A888E-E142-46B0-B34F-88F7142F7180}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC8A888E-E142-46B0-B34F-88F7142F7180}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC8A888E-E142-46B0-B34F-88F7142F7180}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E66D05B4-24AB-467C-B903-C3FE03447AA7}
 	EndGlobalSection
 EndGlobal

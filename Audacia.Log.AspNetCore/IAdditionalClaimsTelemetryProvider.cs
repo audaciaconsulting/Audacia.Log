@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Audacia.Log.AspNetCore;
 
@@ -11,7 +11,7 @@ public interface IAdditionalClaimsTelemetryProvider
     /// <summary>
     /// Gets additional claims.
     /// </summary>
-    /// <param name="httpContextAccessor"><see cref="IHttpContextAccessor"/>.</param>
+    /// <param name="claims">User claims <see cref="Claim"/> collection.</param>
     /// <returns>List of Tuples(Name,Data).</returns>
-    List<(string Name, string Data)> GetClaims(IHttpContextAccessor httpContextAccessor);
+    List<ClaimsData> GetClaims(IEnumerable<Claim> claims);
 }

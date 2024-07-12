@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Security.Claims;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Audacia.Log.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Options;
 
 namespace Audacia.Log.AspNetCore;
@@ -109,7 +106,7 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
         }
     }
 
-    private static LogActionFilterConfig GetControllerActionFilter(ActionExecutingContext context)
+    private static LogActionFilterConfig? GetControllerActionFilter(ActionExecutingContext context)
     {
         // Get attribute for per request configuration
         return context.ActionDescriptor.FilterDescriptors
