@@ -79,13 +79,13 @@ This extension method is overloaded and if you want to pass in your own implemen
 public void ConfigureServices(IServiceCollection services)
 {
 	services.ConfigureActionContentLogging(Configuration);
- .AddClaimsTelemetry(new CustomAdditionalClaimsTelemetryProvider((user) => 
-  {
-      return new List<(string Name, string Data)>
-      {
-          ("customproperty", user.Claims.Where(c => c.Type == "customproperty").Single().Value)
-      };
-  }))
+    services.AddClaimsTelemetry(new CustomAdditionalClaimsTelemetryProvider((user) => 
+    {
+          return new List<(string Name, string Data)>
+          {
+              ("customproperty", user.Claims.Where(c => c.Type == "customproperty").Single().Value)
+          };
+    }))
 	services.AddControllers(x => x.Filters.Add<LogClaimsActionFilterAttribute>());
 }
 ```
@@ -112,7 +112,7 @@ To configure the overrides for "sub" and "role" add the `LogActionFilter` sectio
 
 ```json
 {
-  "LogActionFilter": {
+    "LogActionFilter": {
     "IdClaimType": "oid",
     "RoleClaimType": "access"
   }
@@ -127,7 +127,7 @@ For example using "Password" as the value will filter; Password, password, NewPa
 
 ```json
 {
-  "LogActionFilter": {
+    "LogActionFilter": {
     "DisableBody": false,
     "MaxDepth":  10,
     "ExcludeArguments": [ "password", "token", "apikey" ],
