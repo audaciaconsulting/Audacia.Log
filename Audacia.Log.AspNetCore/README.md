@@ -107,10 +107,10 @@ To configure the overrides for "sub" and "role" add the `LogActionFilter` sectio
 
 ```json
 {
-    "LogActionFilter": {
-    "IdClaimType": "oid",
-    "RoleClaimType": "access"
-  }
+ "LogActionFilter": {
+ "IdClaimType": "oid",
+ "RoleClaimType": "access"
+ }
 }
 ```
 
@@ -122,12 +122,12 @@ For example using "Password" as the value will filter; Password, password, NewPa
 
 ```json
 {
-    "LogActionFilter": {
-    "DisableBody": false,
-    "MaxDepth":  10,
-    "ExcludeArguments": [ "password", "token", "apikey" ],
-    "IncludeClaims": [ "client_id" ]
-  }
+ "LogActionFilter": {
+ "DisableBody": false,
+ "MaxDepth":  10,
+ "ExcludeArguments": [ "password", "token", "apikey" ],
+ "IncludeClaims": [ "client_id" ]
+ }
 }
 ```
 
