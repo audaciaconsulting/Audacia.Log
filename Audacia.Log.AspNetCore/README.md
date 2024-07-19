@@ -50,7 +50,7 @@ public IConfiguration Configuration { get; set; }
 
 public void ConfigureServices(IServiceCollection services)
 {
-	services.ConfigureApplicationInsights(Configuration);
+ services.ConfigureApplicationInsights(Configuration);
 }
 ```
 
@@ -66,9 +66,9 @@ public IConfiguration Configuration { get; set; }
 
 public void ConfigureServices(IServiceCollection services)
 {
-	services.ConfigureActionContentLogging(Configuration);
-  services.AddClaimsTelemetry();
-	services.AddControllers(x => x.Filters.Add<LogClaimsActionFilterAttribute>());
+ services.ConfigureActionContentLogging(Configuration);
+ services.AddClaimsTelemetry();
+ services.AddControllers(x => x.Filters.Add<LogClaimsActionFilterAttribute>());
 }
 ```
 
@@ -95,9 +95,9 @@ public IConfiguration Configuration { get; set; }
 
 public void ConfigureServices(IServiceCollection services)
 {
-	services.ConfigureActionContentLogging(Configuration);
+  services.ConfigureActionContentLogging(Configuration);
   services.AddRequestBodyTelemetry();
-	services.AddControllers(x => x.Filters.Add<LogRequestBodyActionFilterAttribute>());
+  services.AddControllers(x => x.Filters.Add<LogRequestBodyActionFilterAttribute>());
 }
 ```
 
