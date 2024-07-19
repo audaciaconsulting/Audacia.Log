@@ -67,27 +67,22 @@ public IConfiguration Configuration { get; set; }
 public void ConfigureServices(IServiceCollection services)
 {
 	services.ConfigureActionContentLogging(Configuration);
-    services.AddClaimsTelemetry();
+  services.AddClaimsTelemetry();
 	services.AddControllers(x => x.Filters.Add<LogClaimsActionFilterAttribute>());
 }
 ```
 
-#### AddClaimsTelemetry()
-This extension method is overloaded and if you want to pass in your own implementation of "CustomAdditionalClaimsTelemetryProvider" to select which properties you would like to pass on, do it like below:
+#### Add optional CustomAdditionalClaimsTelemetryProvider
+AddClaimsTelemetry() is overloaded and if you want to pass in your own implementation of "CustomAdditionalClaimsTelemetryProvider" to select which properties you would like to pass on, do it like below:
 
 ```csharp
-public void ConfigureServices(IServiceCollection services)
+services.AddClaimsTelemetry(new CustomAdditionalClaimsTelemetryProvider((user) => 
 {
-	services.ConfigureActionContentLogging(Configuration);
-    services.AddClaimsTelemetry(new CustomAdditionalClaimsTelemetryProvider((user) => 
-    {
-          return new List<(string Name, string Data)>
-          {
-              ("customproperty", user.Claims.Where(c => c.Type == "customproperty").Single().Value)
-          };
-    }))
-	services.AddControllers(x => x.Filters.Add<LogClaimsActionFilterAttribute>());
-}
+  return new List<(string Name, string Data)>
+  {
+    ("customproperty", user.Claims.Where(c => c.Type == "customproperty").Single().Value)
+  };
+}))
 ```
 
 #### RequestBodyActionLogFilter
@@ -100,9 +95,9 @@ public IConfiguration Configuration { get; set; }
 
 public void ConfigureServices(IServiceCollection services)
 {
-	  services.ConfigureActionContentLogging(Configuration);
-      services.AddRequestBodyTelemetry();
-	  services.AddControllers(x => x.Filters.Add<LogRequestBodyActionFilterAttribute>());
+	services.ConfigureActionContentLogging(Configuration);
+  services.AddRequestBodyTelemetry();
+	services.AddControllers(x => x.Filters.Add<LogRequestBodyActionFilterAttribute>());
 }
 ```
 
