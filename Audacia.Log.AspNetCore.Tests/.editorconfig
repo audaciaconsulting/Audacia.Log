@@ -19,6 +19,7 @@ dotnet_diagnostic.ACL1001.severity = warning
 
 # Methods should not exceed a predefined number of statements.
 dotnet_diagnostic.ACL1002.severity = warning
+dotnet_diagnostic.ACL1002.max_statement_count = 15
 
 # Don't declare signatures with more than a predefined number of parameters
 dotnet_diagnostic.ACL1003.severity = warning
@@ -2353,7 +2354,7 @@ dotnet_diagnostic.IDE0037.severity = warning
 dotnet_diagnostic.IDE0038.severity = warning
 
 # Use local function instead of lambda
-dotnet_diagnostic.IDE0039.severity = warning
+dotnet_diagnostic.IDE0039.severity = none
 
 # Add accessibility modifiers
 dotnet_diagnostic.IDE0040.severity = warning

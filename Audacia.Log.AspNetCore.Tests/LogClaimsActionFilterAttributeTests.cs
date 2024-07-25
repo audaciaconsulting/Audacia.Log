@@ -16,9 +16,8 @@ public class LogClaimsActionFilterAttributeTests
     private readonly string _userId = Guid.NewGuid().ToString();
 
     private readonly string _role = "admin";
-    
+
     [Test]
-    [MaxMethodLength(11)]
     public async Task WhenUsingLogClaimsActionFilterItAddsUserIdAndRoleToHttpContextItemsAsync()
     {
         IOptions<LogActionFilterConfig> config = Options.Create(new LogActionFilterConfig());
@@ -29,7 +28,7 @@ public class LogClaimsActionFilterAttributeTests
 
         ActionExecutionDelegate next = () =>
         {
-            var actionExecutedContext = new ActionExecutedContext(context, new List<IFilterMetadata>(), Mock.Of<Controller>());
+            var actionExecutedContext = new ActionExecutedContext(context, [], Mock.Of<Controller>());
             return Task.FromResult(actionExecutedContext);
         };
 
@@ -59,34 +58,35 @@ public class LogClaimsActionFilterAttributeTests
 
         ActionExecutionDelegate next = () =>
         {
-            var actionExecutedContext = new ActionExecutedContext(context, new List<IFilterMetadata>(), Mock.Of<Controller>());
+            var actionExecutedContext = new ActionExecutedContext(context, [], Mock.Of<Controller>());
             return Task.FromResult(actionExecutedContext);
         };
 
         await filterAttribute.OnActionExecutionAsync(context, next);
-                
+
         Assert.That(context.HttpContext.Items.Single(i => i.Key.ToString() == "ActionUserId").Value.ToString() == _userId, Is.EqualTo(true));
 
         Assert.That(context.HttpContext.Items.Single(i => i.Key.ToString() == "ActionUserRoles").Value.ToString() == _role, Is.EqualTo(true));
     }
 
-    private ActionExecutingContext GetExecutingContext(string userIdClaimType, string roleClaimType) 
+    private ActionExecutingContext GetExecutingContext(string userIdClaimType, string roleClaimType)
     {
         var modelState = new ModelStateDictionary();
 
         var claims = new List<Claim>()
         {
-                new Claim(userIdClaimType, _userId),
-                new Claim(roleClaimType, _role)
+                new(userIdClaimType, _userId),
+                new(roleClaimType, _role)
         };
 
         var identity = new ClaimsIdentity(claims, "TestAuthType");
 
         var contextUser = new ClaimsPrincipal(identity);
 
-        var httpContext = new DefaultHttpContext();
-
-        httpContext.User = contextUser;
+        var httpContext = new DefaultHttpContext()
+        {
+            User = contextUser
+        };
 
         var context = new ActionExecutingContext(
             new ActionContext(
@@ -94,7 +94,7 @@ public class LogClaimsActionFilterAttributeTests
                    routeData: new RouteData(),
                    actionDescriptor: new ActionDescriptor() { FilterDescriptors = [] },
                    modelState: modelState),
-            new List<IFilterMetadata>(),
+            [],
             new Dictionary<string, object>(),
             new Mock<Controller>().Object);
 

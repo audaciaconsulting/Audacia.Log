@@ -3,7 +3,7 @@
 /// <summary>
 /// ClaimsData record to hold type and value of a selected user claim.
 /// </summary>
-public class ClaimsData 
+public class ClaimsData
 {
     /// <summary>
     /// Gets or sets Type of the claim.
