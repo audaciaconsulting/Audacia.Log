@@ -66,9 +66,60 @@ public static class ServiceCollectionExtensions
 
         // Configure global configuration for the LogActionFilter
         services.Configure<LogActionFilterConfig>(configuration.GetSection("LogActionFilter"));
+        
+        return services;
+    }
 
-        // Add telemetry initialiser to attach request data captured by LogActionFilter
-        services.AddSingleton<ITelemetryInitializer, LogActionTelemetryInitialiser>();
+    /// <summary>
+    /// This will inject <see cref="LogRequestBodyActionTelemetryInitialiser" />.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+    public static IServiceCollection AddRequestBodyTelemetry(this IServiceCollection services) 
+    {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+
+        // Add telemetry initialiser to attach request data captured by LogRequestBodyActionFilter
+        services.AddSingleton<ITelemetryInitializer, LogRequestBodyActionTelemetryInitialiser>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// This will inject <see cref="IAdditionalClaimsTelemetryProvider" /> and <see cref="LogClaimsActionTelemetryInitialiser" />.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>    
+    public static IServiceCollection AddClaimsTelemetry(this IServiceCollection services) 
+    {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+                
+        return AddClaimsTelemetry(services, new CustomAdditionalClaimsTelemetryProvider((_) => { return []; }));
+    }
+
+    /// <summary>
+    /// This will inject <see cref="IAdditionalClaimsTelemetryProvider" />.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="additionalClaimsTelemetryProvider"></param>
+    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+    public static IServiceCollection AddClaimsTelemetry(this IServiceCollection services, IAdditionalClaimsTelemetryProvider additionalClaimsTelemetryProvider)
+    {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+
+        // Add telemetry initialiser to attach request data captured by LogRequestBodyActionFilter
+        services.AddSingleton<ITelemetryInitializer, LogClaimsActionTelemetryInitialiser>();
+
+        services.AddSingleton<IAdditionalClaimsTelemetryProvider>(additionalClaimsTelemetryProvider);
 
         return services;
     }

@@ -10,15 +10,9 @@ namespace Audacia.Log.AspNetCore;
 /// <summary>
 /// Attaches request content stored on the <see cref="HttpContext"/> to <see cref="RequestTelemetry"/>.
 /// </summary>
-public sealed class LogActionTelemetryInitialiser : ITelemetryInitializer
+public sealed class LogRequestBodyActionTelemetryInitialiser : ITelemetryInitializer
 {
     internal const string ActionArguments = "ActionArguments";
-
-    internal const string ActionClaims = "ActionClaims";
-
-    internal const string ActionUserId = "ActionUserId";
-
-    internal const string ActionUserRoles = "ActionUserRoles";
 
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -26,7 +20,7 @@ public sealed class LogActionTelemetryInitialiser : ITelemetryInitializer
     /// Creates an instance of RequestDataTelemetryInitialiser.
     /// </summary>
     /// <param name="httpContextAccessor">Http context accessor</param>
-    public LogActionTelemetryInitialiser(IHttpContextAccessor httpContextAccessor)
+    public LogRequestBodyActionTelemetryInitialiser(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor ??
             throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -40,23 +34,11 @@ public sealed class LogActionTelemetryInitialiser : ITelemetryInitializer
         {
             return;
         }
-        
-        TryAddProperty(requestTelemetry, "UserId", ActionUserId);
-        TryAddProperty(requestTelemetry, "UserRoles", ActionUserRoles);
-        TryAddProperty(requestTelemetry, "UserClaims", ActionClaims);
 
-        if (_httpContextAccessor.HttpContext?.HasFormData() == true)
+        if (_httpContextAccessor.HttpContext?.HasFormData() == true && _httpContextAccessor.HttpContext.Items.ContainsKey(ActionArguments))
         {
-            TryAddProperty(requestTelemetry, "Arguments", ActionArguments);
-        }
-    }
-
-    private void TryAddProperty(RequestTelemetry telemetry, string propertyName, string httpContextItemKey)
-    {
-        if (_httpContextAccessor.HttpContext.Items.ContainsKey(httpContextItemKey))
-        {
-            var logPropertyData = _httpContextAccessor.HttpContext.Items[httpContextItemKey].ToString();
-            telemetry.Properties.Add(propertyName, logPropertyData);
+            var logPropertyData = _httpContextAccessor.HttpContext.Items[ActionArguments].ToString();
+            requestTelemetry.Properties.Add("Arguments", logPropertyData);
         }
     }
 }

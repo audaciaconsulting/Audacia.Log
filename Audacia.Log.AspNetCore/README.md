@@ -34,7 +34,7 @@ The default logging providers are Debug, Console, EventLog, EventSource, Applica
         "Microsoft": "Warning",
         "Microsoft.Hosting.Lifetime": "Warning",
         "IdentityServer4": "Information",
-        "IdentityServer4.Validation.TokenValidator": "Warning"
+        "IdentityServer4.Validation.TokenValidator": "Warning",
       }
     }
   }
@@ -50,14 +50,14 @@ public IConfiguration Configuration { get; set; }
 
 public void ConfigureServices(IServiceCollection services)
 {
-	services.ConfigureApplicationInsights(Configuration);
+ services.ConfigureApplicationInsights(Configuration);
 }
 ```
 
 ### Optional
 
-#### ActionLogFilter
-This filter can be registered to include logs for the beginning and end of each Action Method. The request parameters are included, as well as details of the response such as the type of model returned. Register it like so:
+#### ClaimsActionLogFilter
+This filter can be registered to include logs for any claims at the beginning and end of each Action Method. Register it like so:
 
 ```csharp
 using Audacia.Log.AspNetCore;
@@ -66,8 +66,51 @@ public IConfiguration Configuration { get; set; }
 
 public void ConfigureServices(IServiceCollection services)
 {
-	services.ConfigureActionContentLogging(Configuration);
-	services.AddControllers(x => x.Filters.Add<LogActionFilterAttribute>());
+ services.ConfigureActionContentLogging(Configuration);
+ services.AddClaimsTelemetry();
+ services.AddControllers(x => x.Filters.Add<LogClaimsActionFilterAttribute>());
+}
+```
+
+#### Add optional CustomAdditionalClaimsTelemetryProvider
+AddClaimsTelemetry() is overloaded and if you want to pass in your own implementation of "CustomAdditionalClaimsTelemetryProvider" to select which properties you would like to pass on, do it like below:
+
+```csharp
+services.AddClaimsTelemetry(new CustomAdditionalClaimsTelemetryProvider((user) => 
+{
+  return new List<(string Name, string Data)>
+  {
+    ("customproperty", user.Claims.Where(c => c.Type == "customproperty").Single().Value)
+  };
+}))
+```
+
+#### RequestBodyActionLogFilter
+This filter can be registered to include logs for the beginning and end of each Action Method. This only includes request parameters as well as details of the response such as the type of model returned. Register it like so:
+
+```csharp
+using Audacia.Log.AspNetCore;
+
+public IConfiguration Configuration { get; set; }
+
+public void ConfigureServices(IServiceCollection services)
+{
+  services.ConfigureActionContentLogging(Configuration);
+  services.AddRequestBodyTelemetry();
+  services.AddControllers(x => x.Filters.Add<LogRequestBodyActionFilterAttribute>());
+}
+```
+
+##### Configure "sub" and "role" override
+
+To configure the overrides for "sub" and "role" add the `LogActionFilter` section to your `appsettings.json` file like below.
+
+```json
+{
+ "LogActionFilter": {
+  "IdClaimType": "oid",
+  "RoleClaimType": "access"
+ }
 }
 ```
 
@@ -79,12 +122,12 @@ For example using "Password" as the value will filter; Password, password, NewPa
 
 ```json
 {
-  "LogActionFilter": {
-    "DisableBody": false,
-    "MaxDepth":  10,
-    "ExcludeArguments": [ "password", "token", "apikey" ],
-    "IncludeClaims": [ "client_id" ]
-  }
+ "LogActionFilter": {
+  "DisableBody": false,
+  "MaxDepth":  10,
+  "ExcludeArguments": [ "password", "token", "apikey" ],
+  "IncludeClaims": [ "client_id" ]
+ }
 }
 ```
 
