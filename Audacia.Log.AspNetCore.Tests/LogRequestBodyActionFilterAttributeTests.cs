@@ -12,7 +12,7 @@ namespace Audacia.Log.AspNetCore.Tests;
 
 public class LogRequestBodyActionFilterAttributeTests
 {
-    private readonly Tuple<string, string> _returnUrl = new Tuple<string, string>("returnUrl", "someulr");
+    private readonly Tuple<string, string> _returnUrl = new Tuple<string, string>("returnUrl", "someUrl");
 
     private readonly Tuple<string, string> _requestId = new Tuple<string, string>("requestId", "0");
 
