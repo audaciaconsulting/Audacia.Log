@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using JsonException = System.Text.Json.JsonException;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Audacia.Log.AspNetCore;
 
@@ -31,37 +31,36 @@ public sealed class LogResponseBodyActionFilterAttribute : ActionFilterAttribute
     /// <summary>
     /// Gets the names of properties to exclude from the logs.
     /// </summary>
-    public ICollection<string> ExcludedProperties { get; } =
-    [
+    public ICollection<string> ExcludedProperties { get; } = new List<string>
+    {
         "username",
         "password",
         "email",
         "token",
-        "bearer"
-    ];
+        "bearer",
+        "name",
+        "firstname",
+        "lastname",
+        "phonenumber",
+        "dateofbirth"
+    };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LogResponseBodyActionFilterAttribute"/> class.
     /// Creates a new instance of <see cref="ActionFilterAttribute"/>.
     /// </summary>
     /// <param name="options">Global log filter configuration.</param>
-    [SuppressMessage(
-        "Design",
-        "CA1019:Define accessors for attribute arguments",
-        Justification = "Options does not need to a corresponding property.")]
     public LogResponseBodyActionFilterAttribute(IOptions<LogActionFilterConfig> options)
     {
         Configure(options?.Value);
     }
 
-    /// <inheritdoc/>
-#pragma warning disable ACL1002
-    public override async Task OnActionExecutionAsync(
-        ActionExecutingContext context,
-        ActionExecutionDelegate next)
-#pragma warning restore ACL1002
+    /// <inheritdoc />
+    public override Task OnResultExecutionAsync(
+        ResultExecutingContext context,
+        ResultExecutionDelegate next)
     {
-        var httpContext = context?.HttpContext;
+        var httpContext = context.HttpContext;
 
         if (httpContext != default)
         {
@@ -70,46 +69,30 @@ public sealed class LogResponseBodyActionFilterAttribute : ActionFilterAttribute
 
         if (DisableBodyContent)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        var originalBodyStream = httpContext!.Response.Body;
-
-        await using var responseBodyStream = new MemoryStream();
-        httpContext.Response.Body = responseBodyStream;
-
-        var executedContext = await next();
-
-        httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
-        using var sr = new StreamReader(httpContext.Response.Body);
-        var responseBodyText = await sr.ReadToEndAsync();
-        httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
-
-        try
+        if (context is { Result: ObjectResult objectResult } && httpContext is not null)
         {
-            var responseBodyJson = JsonConvert.DeserializeObject<JObject>(responseBodyText);
-            if (responseBodyJson != null)
-            {
-                // Remove the excluded properties
-#pragma warning disable ACL1011
-                foreach (var property in ExcludedProperties)
-                {
-                    responseBodyJson.Remove(property);
-                }
-#pragma warning restore ACL1011
-            }
-
-            httpContext!.Items.Add(LogResponseBodyActionTelemetryInitialiser.ActionResponseBody, responseBodyJson);
+            ProcessResponse(objectResult, httpContext);
         }
-        catch (JsonException)
+
+        return Task.CompletedTask;
+    }
+
+    private void ProcessResponse(
+        ObjectResult objectResult,
+        HttpContext httpContext)
+    {
+        var responseDic = new Dictionary<string, object> { { "Value", objectResult.Value } };
+
+        // Copy action content and remove PII
+        var arguments = new ActionArgumentDictionary(responseDic, MaxDepth, ExcludedProperties);
+
+        if (arguments.Any())
         {
-            // Handle JSON parsing errors if necessary
-            httpContext!.Items.Add(
-                LogResponseBodyActionTelemetryInitialiser.ActionResponseBody,
-                "Failure to deserialize response body");
+            httpContext.Items.Add(LogResponseBodyActionTelemetryInitialiser.ActionResponseBody, arguments);
         }
-
-        await responseBodyStream.CopyToAsync(originalBodyStream);
     }
 
     /// <summary>
@@ -141,7 +124,7 @@ public sealed class LogResponseBodyActionFilterAttribute : ActionFilterAttribute
         }
     }
 
-    private static LogActionFilterConfig? GetControllerActionFilter(ActionExecutingContext context)
+    private static LogActionFilterConfig? GetControllerActionFilter(ResultExecutingContext context)
     {
         // Get attribute for per response configuration
         return context.ActionDescriptor.FilterDescriptors

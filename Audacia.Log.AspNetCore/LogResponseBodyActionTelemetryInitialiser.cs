@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -17,7 +16,7 @@ public sealed class LogResponseBodyActionTelemetryInitialiser : ITelemetryInitia
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
-    /// Creates an instance of RequestDataTelemetryInitialiser.
+    /// Creates an instance of LogResponseBodyActionTelemetryInitialiser.
     /// </summary>
     /// <param name="httpContextAccessor">Http context accessor</param>
     public LogResponseBodyActionTelemetryInitialiser(IHttpContextAccessor httpContextAccessor)
@@ -30,32 +29,11 @@ public sealed class LogResponseBodyActionTelemetryInitialiser : ITelemetryInitia
     public void Initialize(ITelemetry telemetry)
     {
         // Only add logs to RequestTelemetry
-        if (telemetry is RequestTelemetry requestTelemetry)
+        if (telemetry is RequestTelemetry requestTelemetry &&
+            _httpContextAccessor.HttpContext.Items.TryGetValue(ActionResponseBody, value: out var response))
         {
-            var context = _httpContextAccessor.HttpContext;
-
-            if (context is { Request: not null, Response: not null })
-            {
-                // Add request body
-                context.Request.EnableBuffering();
-                // using (var reader = new StreamReader(context.Request.Body))
-                // {
-                //     var requestBody = reader.ReadToEnd();
-                //     requestTelemetry.Properties["RequestBody"] = requestBody;
-                //     context.Request.Body.Position = 0;
-                // }
-
-                // Add response body
-                context.Response.OnCompleted(
-                    async () =>
-                    {
-                        context.Response.Body.Seek(0, SeekOrigin.Begin);
-                        using var reader = new StreamReader(context.Response.Body);
-                        var responseBody = await reader.ReadToEndAsync();
-                        requestTelemetry.Properties["ResponseBody"] = responseBody;
-                        context.Response.Body.Seek(0, SeekOrigin.Begin);
-                    });
-            }
+            var logPropertyData = response?.ToString();
+            requestTelemetry.Properties.Add("ResponseBody", logPropertyData);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Audacia.Log.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Compliance.Classification;
 using Microsoft.Extensions.Options;
 
 namespace Audacia.Log.AspNetCore;
@@ -32,7 +33,12 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
         "password",
         "email",
         "token",
-        "bearer"
+        "bearer",
+        "name",
+        "firstname",
+        "lastname",
+        "phonenumber",
+        "dateofbirth",
     ];
 
     /// <summary>
@@ -40,18 +46,19 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
     /// Creates a new instance of <see cref="ActionFilterAttribute"/>.
     /// </summary>
     /// <param name="options">Global log filter configuration.</param>
-    [SuppressMessage("Design", "CA1019:Define accessors for attribute arguments", Justification = "Options does not need to a corresponding property.")]
-    public LogRequestBodyActionFilterAttribute(IOptions<LogActionFilterConfig> options) 
+    public LogRequestBodyActionFilterAttribute(IOptions<LogActionFilterConfig> options)
     {
         Configure(options?.Value);
     }
 
     /// <inheritdoc/>
-    public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    public override Task OnActionExecutionAsync(
+        ActionExecutingContext context,
+        ActionExecutionDelegate next)
     {
         var httpContext = context?.HttpContext;
 
-        if (httpContext != default) 
+        if (httpContext != default)
         {
             Configure(GetControllerActionFilter(context!));
         }
@@ -68,7 +75,7 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
     /// Applies configuration to the log filter if provided.
     /// </summary>
     /// <param name="config">global or action config.</param>
-    private void Configure(LogActionFilterConfig? config) 
+    private void Configure(LogActionFilterConfig? config)
     {
         if (config == null)
         {
@@ -93,9 +100,14 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
         }
     }
 
-    private void AddBodyContent(ActionExecutingContext context, HttpContext httpContext)
+    private void AddBodyContent(
+        ActionExecutingContext context,
+        HttpContext httpContext)
     {
-        if (DisableBodyContent) { return; }
+        if (DisableBodyContent)
+        {
+            return;
+        }
 
         // Copy action content and remove PII
         var arguments = new ActionArgumentDictionary(context.ActionArguments, MaxDepth, ExcludeArguments);
@@ -112,12 +124,13 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
         return context.ActionDescriptor.FilterDescriptors
             .Select(descriptor => descriptor.Filter)
             .OfType<LogFilterAttribute>()
-            .Select(attribute => new LogActionFilterConfig
-            {
-                ExcludeArguments = attribute.ExcludeArguments,
-                MaxDepth = attribute.MaxDepth,
-                DisableBodyContent = attribute.DisableBodyContent
-            })
+            .Select(
+                attribute => new LogActionFilterConfig
+                {
+                    ExcludeArguments = attribute.ExcludeArguments,
+                    MaxDepth = attribute.MaxDepth,
+                    DisableBodyContent = attribute.DisableBodyContent
+                })
             .FirstOrDefault();
     }
 }
