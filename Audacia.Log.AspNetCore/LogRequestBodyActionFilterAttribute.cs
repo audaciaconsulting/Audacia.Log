@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Audacia.Log.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Compliance.Classification;
 using Microsoft.Extensions.Options;
 
 namespace Audacia.Log.AspNetCore;
@@ -110,7 +108,7 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
         }
 
         // Copy action content and remove PII
-        var arguments = new ActionArgumentDictionary(context.ActionArguments, MaxDepth, ExcludeArguments);
+        var arguments = new RedactionDictionary(context.ActionArguments, MaxDepth, ExcludeArguments);
 
         if (arguments.Any())
         {

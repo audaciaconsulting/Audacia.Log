@@ -41,7 +41,7 @@ public class LogRequestBodyActionFilterAttributeTests
 
         await filterAttribute.OnActionExecutionAsync(context, next);
 
-        var actionArgs = (ActionArgumentDictionary)context.HttpContext.Items.Single(i => i.Key.ToString() == "ActionArguments").Value;
+        var actionArgs = (RedactDictionary)context.HttpContext.Items.Single(i => i.Key.ToString() == "ActionArguments").Value;
         
         Assert.That(actionArgs, Has.Count.EqualTo(2));
 

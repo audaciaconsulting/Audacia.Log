@@ -87,7 +87,7 @@ public sealed class LogResponseBodyActionFilterAttribute : ActionFilterAttribute
         var responseDic = new Dictionary<string, object> { { "Value", objectResult.Value } };
 
         // Copy action content and remove PII
-        var arguments = new ActionArgumentDictionary(responseDic, MaxDepth, ExcludedProperties);
+        var arguments = new RedactionDictionary(responseDic, MaxDepth, ExcludedProperties);
 
         if (arguments.Any())
         {
