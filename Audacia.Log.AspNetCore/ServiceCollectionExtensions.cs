@@ -15,7 +15,9 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
-    public static IServiceCollection ConfigureApplicationInsights(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection ConfigureApplicationInsights(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         if (services == null)
         {
@@ -38,18 +40,23 @@ public static class ServiceCollectionExtensions
 
         if (!string.IsNullOrWhiteSpace(quickPulseKey))
         {
-            services.ConfigureTelemetryModule<QuickPulseTelemetryModule>((module, _) => module.AuthenticationApiKey = quickPulseKey);
+            services.ConfigureTelemetryModule<QuickPulseTelemetryModule>(
+                (
+                    module,
+                    _) => module.AuthenticationApiKey = quickPulseKey);
         }
 
         return services;
     }
 
     /// <summary>
-    /// Configures logging of the request body for all actions.
+    /// Configures logging of the request and responses body for all actions.
     /// </summary>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
-    public static IServiceCollection ConfigureActionContentLogging(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection ConfigureActionContentLogging(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         if (services == null)
         {
@@ -66,7 +73,7 @@ public static class ServiceCollectionExtensions
 
         // Configure global configuration for the LogActionFilter
         services.Configure<LogActionFilterConfig>(configuration.GetSection("LogActionFilter"));
-        
+
         return services;
     }
 
@@ -75,7 +82,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services"></param>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
-    public static IServiceCollection AddRequestBodyTelemetry(this IServiceCollection services) 
+    public static IServiceCollection AddActionRequestBodyTelemetry(this IServiceCollection services)
     {
         if (services == null)
         {
@@ -89,17 +96,81 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// This will inject <see cref="IAdditionalClaimsTelemetryProvider" /> and <see cref="LogClaimsActionTelemetryInitialiser" />.
+    /// This will inject <see cref="LogResponseBodyActionTelemetryInitialiser" />.
     /// </summary>
     /// <param name="services"></param>
-    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>    
-    public static IServiceCollection AddClaimsTelemetry(this IServiceCollection services) 
+    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+    public static IServiceCollection AddActionResponseBodyTelemetry(this IServiceCollection services)
     {
         if (services == null)
         {
             throw new ArgumentNullException(nameof(services));
         }
-                
+
+        // Add telemetry initialiser to attach request data captured by LogRequestBodyActionFilter
+        services.AddSingleton<ITelemetryInitializer, LogRequestBodyActionTelemetryInitialiser>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Configures logging of the http bodies for all http dependency requests.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
+    public static IServiceCollection ConfigureDependencyBodyContentLogging(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+
+        if (configuration == null)
+        {
+            throw new ArgumentNullException(nameof(configuration));
+        }
+
+        // Required for attaching the request telemetry to the HttpContext
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+        // Configure global configuration for the LogActionFilter
+        services.Configure<LogActionFilterConfig>(configuration.GetSection("LogActionFilter"));
+
+        return services;
+    }
+
+    /// <summary>
+    /// This will inject <see cref="HttpDependencyBodyCaptureTelemetryInitializer" />.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+    public static IServiceCollection AddDependencyBodyTelemetry(this IServiceCollection services)
+    {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+
+        // Add telemetry initialiser to attach dependency http data captured by HttpDependencyBodyCaptureTelemetryInitializer
+        services.AddSingleton<ITelemetryInitializer, HttpDependencyBodyCaptureTelemetryInitializer>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// This will inject <see cref="IAdditionalClaimsTelemetryProvider" /> and <see cref="LogClaimsActionTelemetryInitialiser" />.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>    
+    public static IServiceCollection AddClaimsTelemetry(this IServiceCollection services)
+    {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+
         return AddClaimsTelemetry(services, new CustomAdditionalClaimsTelemetryProvider((_) => { return []; }));
     }
 
@@ -109,7 +180,9 @@ public static class ServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="additionalClaimsTelemetryProvider"></param>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
-    public static IServiceCollection AddClaimsTelemetry(this IServiceCollection services, IAdditionalClaimsTelemetryProvider additionalClaimsTelemetryProvider)
+    public static IServiceCollection AddClaimsTelemetry(
+        this IServiceCollection services,
+        IAdditionalClaimsTelemetryProvider additionalClaimsTelemetryProvider)
     {
         if (services == null)
         {

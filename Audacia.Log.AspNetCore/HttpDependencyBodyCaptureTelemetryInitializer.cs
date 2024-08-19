@@ -38,18 +38,19 @@ public class HttpDependencyBodyCaptureTelemetryInitializer : ITelemetryInitializ
 
     /// <summary>Gets the names of arguments to exclude from the logs.</summary>
     public ICollection<string> ExcludeProperties { get; } =
-    [
-        "username",
-        "password",
-        "email",
-        "token",
-        "bearer",
-        "name",
-        "firstname",
-        "lastname",
-        "phonenumber",
-        "dateofbirth",
-    ];
+        new List<string>
+        {
+            "username",
+            "password",
+            "email",
+            "token",
+            "bearer",
+            "name",
+            "firstname",
+            "lastname",
+            "phonenumber",
+            "dateofbirth"
+        };
 
     /// <summary>
     /// Creates telemetry initialiser for enriching dependency telemetry with request and response bodies.
@@ -92,8 +93,8 @@ public class HttpDependencyBodyCaptureTelemetryInitializer : ITelemetryInitializ
     /// <inheritdoc />
     public void Initialize(ITelemetry telemetry)
     {
-        if (telemetry is DependencyTelemetry { Type: "Http" } dependencyTelemetry &&
-            dependencyTelemetry.TryGetOperationDetail("HttpResponse", out var responseObj) &&
+        if (telemetry is DependencyTelemetry dependencyTelemetry &&
+            dependencyTelemetry.TryGetOperationDetail("HttpResponse", out object responseObj) &&
             responseObj is HttpResponseMessage response)
         {
             EnrichResponseBody(response, dependencyTelemetry);

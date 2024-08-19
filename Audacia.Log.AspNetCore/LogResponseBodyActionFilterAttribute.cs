@@ -56,7 +56,7 @@ public sealed class LogResponseBodyActionFilterAttribute : ActionFilterAttribute
     }
 
     /// <inheritdoc />
-    public override Task OnResultExecutionAsync(
+    public override async Task OnResultExecutionAsync(
         ResultExecutingContext context,
         ResultExecutionDelegate next)
     {
@@ -69,7 +69,8 @@ public sealed class LogResponseBodyActionFilterAttribute : ActionFilterAttribute
 
         if (DisableBodyContent)
         {
-            return Task.CompletedTask;
+            await base.OnResultExecutionAsync(context, next);
+            return;
         }
 
         if (context is { Result: ObjectResult objectResult } && httpContext is not null)
@@ -77,7 +78,7 @@ public sealed class LogResponseBodyActionFilterAttribute : ActionFilterAttribute
             ProcessResponse(objectResult, httpContext);
         }
 
-        return Task.CompletedTask;
+        await base.OnResultExecutionAsync(context, next);
     }
 
     private void ProcessResponse(

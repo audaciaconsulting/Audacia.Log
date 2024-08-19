@@ -34,7 +34,7 @@ The default logging providers are Debug, Console, EventLog, EventSource, Applica
         "Microsoft": "Warning",
         "Microsoft.Hosting.Lifetime": "Warning",
         "IdentityServer4": "Information",
-        "IdentityServer4.Validation.TokenValidator": "Warning",
+        "IdentityServer4.Validation.TokenValidator": "Warning"
       }
     }
   }
@@ -96,8 +96,39 @@ public IConfiguration Configuration { get; set; }
 public void ConfigureServices(IServiceCollection services)
 {
   services.ConfigureActionContentLogging(Configuration);
-  services.AddRequestBodyTelemetry();
+  services.AddActionRequestBodyTelemetry(Configuration);
   services.AddControllers(x => x.Filters.Add<LogRequestBodyActionFilterAttribute>());
+}
+```
+
+#### ResponseBodyActionLogFilter
+This filter can be registered to include logs for the beginning and end of each Action Method. This only includes response body as well as details of the response such as the type of model returned. Register it like so:
+
+```csharp
+using Audacia.Log.AspNetCore;
+
+public IConfiguration Configuration { get; set; }
+
+public void ConfigureServices(IServiceCollection services)
+{
+  services.ConfigureActionContentLogging(Configuration);
+  services.AddActionResponseBodyTelemetry(Configuration);
+  services.AddControllers(x => x.Filters.Add<LogResponseBodyActionFilterAttribute>());
+}
+```
+
+#### HttpDependencyBodyCaptureTelemetryInitializer
+To add enrichment fo the request body and response body of dependency HTTP requests.
+
+```csharp
+using Audacia.Log.AspNetCore;
+
+public IConfiguration Configuration { get; set; }
+
+public void ConfigureServices(IServiceCollection services)
+{
+  services.ConfigureDependencyBodyContentLogging(Configuration);
+  services.AddDependencyBodyTelemetry(Configuration);
 }
 ```
 
@@ -114,9 +145,9 @@ To configure the overrides for "sub" and "role" add the `LogActionFilter` sectio
 }
 ```
 
-##### Configure global request filtering
+##### Configure global request and response filtering
 To globally configure the logging of actions you must add the `LogActionFilter` section to your `appsettings.json` file.
-This will allow the redaction of specific parameters from the request body during action logs.
+This will allow the redaction of specific parameters from the request and response body during action logs.
 This is case insensitive and will filter out parameters that contain the provided words.
 For example using "Password" as the value will filter; Password, password, NewPassword, ConfirmPassword, etc.
 
