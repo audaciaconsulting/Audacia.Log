@@ -97,13 +97,13 @@ public class HttpDependencyBodyCaptureTelemetryInitializer : ITelemetryInitializ
             dependencyTelemetry.TryGetOperationDetail("HttpResponse", out object responseObj) &&
             responseObj is HttpResponseMessage response)
         {
-            EnrichResponseBody(response, dependencyTelemetry);
+            EnrichWithResponseBody(response, dependencyTelemetry);
 
             EnrichWithRequestBody(response, dependencyTelemetry);
         }
     }
 
-    private void EnrichResponseBody(
+    private void EnrichWithResponseBody(
         HttpResponseMessage response,
         DependencyTelemetry dependencyTelemetry)
     {
