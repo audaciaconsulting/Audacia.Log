@@ -42,6 +42,7 @@ public class HttpDependencyBodyCaptureTelemetryInitializer : ITelemetryInitializ
         {
             "username",
             "password",
+            "access_token",
             "email",
             "token",
             "bearer",

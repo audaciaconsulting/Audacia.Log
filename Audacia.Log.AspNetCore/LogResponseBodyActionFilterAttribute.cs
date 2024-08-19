@@ -37,6 +37,7 @@ public sealed class LogResponseBodyActionFilterAttribute : ActionFilterAttribute
         "password",
         "email",
         "token",
+        "access_token",
         "bearer",
         "name",
         "firstname",
