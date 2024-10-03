@@ -171,14 +171,14 @@ For example using "phonenumber" as the value will filter: PhoneNumber, MobilePho
 ```json
 {
  "LogDependencyFilter": {
-  "DisableBody": false,
-  "MaxDepth":  10,
-  "ExcludeArguments": [ "password", "token", "apikey" ],
-  "IncludeClaims": [ "client_id" ]
+    "DisableHttpTracking": false,
+    "DisableHttpRequestBody": false,
+    "DisableHttpResponseBody": false,
+    "MaxDepth":  10,
+    "ExcludeArguments": [ "password", "token", "apikey" ]
  }
 }
 ```
-
 
 #### Filtering specific requests
 To filter specific requests the `LogFilterAttribute` can be used. 
