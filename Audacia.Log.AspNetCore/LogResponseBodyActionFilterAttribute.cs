@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using Audacia.Log.AspNetCore.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Audacia.Log.AspNetCore;
 
@@ -38,6 +35,7 @@ public sealed class LogResponseBodyActionFilterAttribute : ActionFilterAttribute
         "email",
         "token",
         "access_token",
+        "id_token",
         "bearer",
         "name",
         "firstname",
@@ -135,7 +133,7 @@ public sealed class LogResponseBodyActionFilterAttribute : ActionFilterAttribute
             .Select(
                 attribute => new LogActionFilterConfig
                 {
-                    ExcludeArguments = attribute.ExcludeArguments,
+                    ExcludeArguments = attribute.ExcludeArguments.ToList(),
                     MaxDepth = attribute.MaxDepth,
                     DisableBodyContent = attribute.DisableBodyContent
                 })

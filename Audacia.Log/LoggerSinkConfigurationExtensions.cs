@@ -9,12 +9,22 @@ namespace Audacia.Log
     /// <summary>Extension methods for configuring default log sinks.</summary>
     public static class LoggerSinkConfigurationExtensions
     {
-        internal const string TraceFormat = "[{UserName}] :: {Message}{NewLine:l}{Exception:l}";
+        /// <summary>
+        /// Message template for trace logs.
+        /// </summary>
+        private const string TraceFormat = "[{UserName}] :: {Message}{NewLine:l}{Exception:l}";
 
-        /// <summary>Configure loggers to use the default sinks.</summary>
+        /// <summary>
+        /// Configure loggers to use the default sinks.
+        /// </summary>
+        /// <param name="config">Logger configuration.</param>
+        /// <param name="audaciaConfig">Audacia Logger configuration.</param>
         /// <exception cref="ArgumentNullException"><paramref name="audaciaConfig"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="config"/> is <see langword="null"/>.</exception>
-        public static LoggerConfiguration Defaults(this LoggerSinkConfiguration config, AudaciaLoggerConfiguration audaciaConfig)
+        /// <returns>Configured Logger Configuration.</returns>
+        public static LoggerConfiguration Defaults(
+            this LoggerSinkConfiguration config,
+            AudaciaLoggerConfiguration audaciaConfig)
         {
             if (config == null)
             {

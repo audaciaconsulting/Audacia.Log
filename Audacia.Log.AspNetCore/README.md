@@ -1,10 +1,10 @@
-## Audacia.Log.AspNetCore
+# Audacia.Log.AspNetCore
 
 Standardized logging configuration for Audacia ASP.NET Core Web projects using Application Insights.
 
 This is a standalone library (from v2.0.0 onwards) and is not dependent on Audacia.Log or Serilog. Please remove them from your web application when upgrading as going forwards the preferred approach is to use purely Application Insights and Microsoft logging abstractions.
 
-### Usage
+## Usage
 
 Copy the following json into your `appsettings.json` file. Configure the Instrumentation Key and  the QuickPulseApi Key to enable application insights for your app service.
 
@@ -16,7 +16,7 @@ The default logging providers are Debug, Console, EventLog, EventSource, Applica
 ```json
 {
   "ApplicationInsights": {
-    "InstrumentationKey": "00000000-0000-0000-0000-000000000000",
+    "ConnectionString": "",
     "EnableAdaptiveSampling": false,
     "QuickPulseApiKey": ""
   },
@@ -54,9 +54,9 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-### Optional
+## Optional
 
-#### ClaimsActionLogFilter
+### ClaimsActionLogFilter
 This filter can be registered to include logs for any claims at the beginning and end of each Action Method. Register it like so:
 
 ```csharp
@@ -72,7 +72,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-#### Add optional CustomAdditionalClaimsTelemetryProvider
+### Add optional CustomAdditionalClaimsTelemetryProvider
 AddClaimsTelemetry() is overloaded and if you want to pass in your own implementation of "CustomAdditionalClaimsTelemetryProvider" to select which properties you would like to pass on, do it like below:
 
 ```csharp
@@ -85,7 +85,7 @@ services.AddClaimsTelemetry(new CustomAdditionalClaimsTelemetryProvider((user) =
 }))
 ```
 
-#### RequestBodyActionLogFilter
+### RequestBodyActionLogFilter
 This filter can be registered to include logs for the beginning and end of each Action Method. This only includes request parameters as well as details of the response such as the type of model returned. Register it like so:
 
 ```csharp
@@ -96,12 +96,12 @@ public IConfiguration Configuration { get; set; }
 public void ConfigureServices(IServiceCollection services)
 {
   services.ConfigureActionContentLogging(Configuration);
-  services.AddActionRequestBodyTelemetry(Configuration);
+  services.AddActionRequestBodyTelemetry();
   services.AddControllers(x => x.Filters.Add<LogRequestBodyActionFilterAttribute>());
 }
 ```
 
-#### ResponseBodyActionLogFilter
+### ResponseBodyActionLogFilter
 This filter can be registered to include logs for the beginning and end of each Action Method. This only includes response body as well as details of the response such as the type of model returned. Register it like so:
 
 ```csharp
@@ -112,12 +112,12 @@ public IConfiguration Configuration { get; set; }
 public void ConfigureServices(IServiceCollection services)
 {
   services.ConfigureActionContentLogging(Configuration);
-  services.AddActionResponseBodyTelemetry(Configuration);
+  services.AddActionResponseBodyTelemetry();
   services.AddControllers(x => x.Filters.Add<LogResponseBodyActionFilterAttribute>());
 }
 ```
 
-#### HttpDependencyBodyCaptureTelemetryInitializer
+### HttpDependencyBodyCaptureTelemetryInitializer
 To add enrichment fo the request body and response body of dependency HTTP requests.
 
 ```csharp
@@ -128,11 +128,11 @@ public IConfiguration Configuration { get; set; }
 public void ConfigureServices(IServiceCollection services)
 {
   services.ConfigureDependencyBodyContentLogging(Configuration);
-  services.AddDependencyBodyTelemetry(Configuration);
+  services.AddDependencyBodyTelemetry();
 }
 ```
 
-##### Configure "sub" and "role" override
+#### Configure "sub" and "role" override
 
 To configure the overrides for "sub" and "role" add the `LogActionFilter` section to your `appsettings.json` file like below.
 
@@ -145,8 +145,8 @@ To configure the overrides for "sub" and "role" add the `LogActionFilter` sectio
 }
 ```
 
-##### Configure global request and response filtering
-To globally configure the logging of actions you must add the `LogActionFilter` section to your `appsettings.json` file.
+#### Configure global request and response filtering for controller actions
+To globally configure the logging of actions you must add the `LogActionFilter` section to your `appsettings.json` file or equivalent.
 This will allow the redaction of specific parameters from the request and response body during action logs.
 This is case insensitive and will filter out parameters that contain the provided words.
 For example using "Password" as the value will filter; Password, password, NewPassword, ConfirmPassword, etc.
@@ -162,7 +162,25 @@ For example using "Password" as the value will filter; Password, password, NewPa
 }
 ```
 
-##### Filtering specific requests
+#### Configure global request and response body capture for dependency metrics
+To globally configure the logging of dependencies you must add the `LogDependencyFilter` section to your `appsettings.json` file or equivalent.
+This will allow for the refaction of specific parameters from the request and response body during dependency logs.
+This is case insensitive and will filter out parameters that contain the provided words.
+For example using "phonenumber" as the value will filter: PhoneNumber, MobilePhoneNumber, AlternativePhoneNumber, etc.
+
+```json
+{
+ "LogDependencyFilter": {
+  "DisableBody": false,
+  "MaxDepth":  10,
+  "ExcludeArguments": [ "password", "token", "apikey" ],
+  "IncludeClaims": [ "client_id" ]
+ }
+}
+```
+
+
+#### Filtering specific requests
 To filter specific requests the `LogFilterAttribute` can be used. 
 To prevent the body content of the web request from being recorded use the `DisableBodyContent` parameter.
 ```c#

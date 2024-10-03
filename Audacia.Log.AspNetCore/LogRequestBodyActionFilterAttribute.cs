@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Audacia.Log.AspNetCore.Configuration;
 using Audacia.Log.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -26,18 +27,21 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
 
     /// <summary>Gets the names of arguments to exclude from the logs.</summary>
     public ICollection<string> ExcludeArguments { get; } =
-    [
-        "username",
-        "password",
-        "email",
-        "token",
-        "bearer",
-        "name",
-        "firstname",
-        "lastname",
-        "phonenumber",
-        "dateofbirth",
-    ];
+        new List<string>()
+        {
+            "username",
+            "password",
+            "email",
+            "token",
+            "access_token",
+            "id_token",
+            "bearer",
+            "name",
+            "firstname",
+            "lastname",
+            "phonenumber",
+            "dateofbirth"
+        };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LogRequestBodyActionFilterAttribute"/> class.
@@ -125,7 +129,7 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
             .Select(
                 attribute => new LogActionFilterConfig
                 {
-                    ExcludeArguments = attribute.ExcludeArguments,
+                    ExcludeArguments = attribute.ExcludeArguments.ToList(),
                     MaxDepth = attribute.MaxDepth,
                     DisableBodyContent = attribute.DisableBodyContent
                 })

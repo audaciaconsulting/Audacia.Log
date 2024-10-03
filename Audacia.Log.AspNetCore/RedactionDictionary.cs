@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
+using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
 using Audacia.Log.AspNetCore.Extensions;
 
 namespace Audacia.Log.AspNetCore;
@@ -21,9 +23,10 @@ public sealed class RedactionDictionary : Dictionary<string, object>
     /// <summary>
     /// Creates a dictionary of key value pairs, excluding parameters marked as personal information.
     /// </summary>
-    /// <param name="context">Dictionary of all arguments on the action context</param>
-    /// <param name="maxDepth">Max object depth to inspect before stopping</param>
-    /// <param name="excludedProperties">Parameter names where content should be redacted</param>
+    /// <param name="context">Dictionary of all arguments on the action context.</param>
+    /// <param name="maxDepth">Max object depth to inspect before stopping.</param>
+    /// <param name="excludedProperties">Parameter names where content should be redacted.</param>
+    /// <exception cref="ArgumentNullException">Thrown when excluded properties has a value of null.</exception>
     public RedactionDictionary(
         IDictionary<string, object> context,
         int maxDepth,
@@ -39,13 +42,8 @@ public sealed class RedactionDictionary : Dictionary<string, object>
             throw new ArgumentOutOfRangeException(nameof(maxDepth), maxDepth, "MaxDepth must be zero or above");
         }
 
-        if (excludedProperties == null)
-        {
-            throw new ArgumentNullException(nameof(excludedProperties));
-        }
-
         MaxDepth = maxDepth;
-        ExcludedProperties = excludedProperties;
+        ExcludedProperties = excludedProperties ?? throw new ArgumentNullException(nameof(excludedProperties));
 
         foreach (var argument in context)
         {
@@ -54,17 +52,20 @@ public sealed class RedactionDictionary : Dictionary<string, object>
     }
 
     /// <summary>
-    /// Returns dictionary content as a json object string.
+    /// Converts dictionary content as a json object string.
     /// </summary>
-    public override string ToString() => AppendDictionary(new StringBuilder(), this).ToString();
+    /// <returns>Returns dictionary content as a json object string.</returns>
+    public override string ToString()
+    {
+        return AppendDictionary(new StringBuilder(), this).ToString();
+    }
 
-#pragma warning disable ACL1002 // Member or local function contains too many statements
+    [MaxMethodLength(13, Justification = "Method is concise and splitting out would not improve readability")]
     private void IncludeData(
         string name,
         object data,
         int depth,
         IDictionary<string, object> parent)
-#pragma warning restore ACL1002 // Member or local function contains too many statements
     {
         // Skip logging of null data
         // Redact when parameter names contain excluded words
@@ -149,14 +150,13 @@ public sealed class RedactionDictionary : Dictionary<string, object>
         }
     }
 
-#pragma warning disable ACL1003 // Signature contains too many parameters
+    [MaxParameterCount(5)]
     private void IncludeObject(
         string name,
         object data,
         Type type,
         int depth,
         IDictionary<string, object> parent)
-#pragma warning restore ACL1003 // Signature contains too many parameters
     {
         var objectData = new Dictionary<string, object>();
 
@@ -179,11 +179,10 @@ public sealed class RedactionDictionary : Dictionary<string, object>
         }
     }
 
-#pragma warning disable ACL1002 // Member or local function contains too many statements
+    [MaxMethodLength(15)]
     private static StringBuilder AppendDictionary(
         StringBuilder builder,
         IDictionary<string, object> dictionary)
-#pragma warning restore ACL1002 // Member or local function contains too many statements
     {
         builder.Append("{");
 
@@ -230,11 +229,10 @@ public sealed class RedactionDictionary : Dictionary<string, object>
         builder.AppendFormat(CultureInfo.InvariantCulture, "\"{0}\"", value.Replace("\"", "\\\""));
     }
 
-#pragma warning disable ACL1002 // Member or local function contains too many statements
+    [MaxMethodLength(14)]
     private static void AppendValueCollection(
         StringBuilder builder,
         ValueCollection valueCollection)
-#pragma warning restore ACL1002 // Member or local function contains too many statements
     {
         builder.Append("[");
 

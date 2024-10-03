@@ -11,10 +11,19 @@ namespace Audacia.Log.AspNetCore;
 /// </summary>
 public sealed class LogClaimsActionTelemetryInitialiser : ITelemetryInitializer
 {
+    /// <summary>
+    /// Custom property name for the claims of the User performing the action.
+    /// </summary>
     internal const string ActionClaims = "ActionClaims";
 
+    /// <summary>
+    /// Custom property name for the Id of the User performing the action.
+    /// </summary>
     internal const string ActionUserId = "ActionUserId";
 
+    /// <summary>
+    /// Custom property name for the roles of the User performing the action.
+    /// </summary>
     internal const string ActionUserRoles = "ActionUserRoles";
 
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -24,14 +33,14 @@ public sealed class LogClaimsActionTelemetryInitialiser : ITelemetryInitializer
     /// <summary>
     /// Creates an instance of RequestDataTelemetryInitialiser.
     /// </summary>
-    /// <param name="httpContextAccessor">Http context accessor</param>
-    /// <param name="additionalClaimsTelemetryProvider">Additional claims provider</param>
+    /// <param name="httpContextAccessor">Http context accessor.</param>
+    /// <param name="additionalClaimsTelemetryProvider">Additional claims provider.</param>
     public LogClaimsActionTelemetryInitialiser(
-        IHttpContextAccessor httpContextAccessor, 
+        IHttpContextAccessor httpContextAccessor,
         IAdditionalClaimsTelemetryProvider additionalClaimsTelemetryProvider)
     {
         _httpContextAccessor = httpContextAccessor ??
-            throw new ArgumentNullException(nameof(httpContextAccessor));
+                               throw new ArgumentNullException(nameof(httpContextAccessor));
         _additionalClaimsTelemetryProvider = additionalClaimsTelemetryProvider;
     }
 
@@ -48,16 +57,20 @@ public sealed class LogClaimsActionTelemetryInitialiser : ITelemetryInitializer
         TryAddProperty(requestTelemetry, "UserRoles", ActionUserRoles);
         TryAddProperty(requestTelemetry, "UserClaims", ActionClaims);
 
-        if (_additionalClaimsTelemetryProvider != null) 
+        if (_additionalClaimsTelemetryProvider != null)
         {
-            foreach (var claimsData in _additionalClaimsTelemetryProvider.GetClaims(_httpContextAccessor.HttpContext.User.Claims)) 
+            foreach (var claimsData in _additionalClaimsTelemetryProvider.GetClaims(
+                         _httpContextAccessor.HttpContext.User.Claims))
             {
                 requestTelemetry.Properties.Add(claimsData.Type, claimsData.Data);
             }
         }
     }
 
-    private void TryAddProperty(RequestTelemetry telemetry, string propertyName, string httpContextItemKey)
+    private void TryAddProperty(
+        RequestTelemetry telemetry,
+        string propertyName,
+        string httpContextItemKey)
     {
         if (_httpContextAccessor.HttpContext.Items.ContainsKey(httpContextItemKey))
         {

@@ -5,11 +5,17 @@ using Serilog.Events;
 
 namespace Audacia.Log
 {
-    /// <summary>Extension methods for configuring default minimal level filters..</summary>
+    /// <summary>
+    /// Extension methods for configuring default minimal level filters.
+    /// </summary>
     public static class LoggerMinimumLevelConfigurationExtensions
     {
-        /// <summary>Creates a default logger config with enrichers and sinks.</summary>
+        /// <summary>
+        /// Creates a default logger config with enrichers and sinks.
+        /// </summary>
+        /// <param name="configuration">Logger Minimum Level configuration.</param>
         /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
+        /// <returns>Configured Logger Configuration.</returns>
         public static LoggerConfiguration Defaults(this LoggerMinimumLevelConfiguration configuration)
         {
             if (configuration == null)

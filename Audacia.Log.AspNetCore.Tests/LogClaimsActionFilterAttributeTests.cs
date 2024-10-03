@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Audacia.CodeAnalysis.Analyzers.Helpers.MethodLength;
+using Audacia.Log.AspNetCore.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -26,21 +26,21 @@ public class LogClaimsActionFilterAttributeTests
 
         var context = GetExecutingContext(ClaimTypes.Sub, ClaimTypes.Role);
 
-        ActionExecutionDelegate next = () =>
+        Task<ActionExecutedContext> Next()
         {
             var actionExecutedContext = new ActionExecutedContext(context, [], Mock.Of<Controller>());
             return Task.FromResult(actionExecutedContext);
-        };
+        }
 
         Assert.That(context.HttpContext.Items, Has.Count.EqualTo(0));
 
-        await filterAttribute.OnActionExecutionAsync(context, next);
+        await filterAttribute.OnActionExecutionAsync(context, Next);
 
         Assert.That(context.HttpContext.Items, Has.Count.EqualTo(2));
 
-        Assert.That(context.HttpContext.Items.Single(i => i.Key.ToString() == "ActionUserId").Value.ToString() == _userId, Is.EqualTo(true));
+        Assert.That(context.HttpContext.Items.Single(pair => pair.Key.ToString() == "ActionUserId").Value.ToString() == _userId, Is.EqualTo(true));
 
-        Assert.That(context.HttpContext.Items.Single(i => i.Key.ToString() == "ActionUserRoles").Value.ToString() == _role, Is.EqualTo(true));
+        Assert.That(context.HttpContext.Items.Single(pair => pair.Key.ToString() == "ActionUserRoles").Value.ToString() == _role, Is.EqualTo(true));
     }
 
     [Test]
@@ -56,17 +56,17 @@ public class LogClaimsActionFilterAttributeTests
 
         var context = GetExecutingContext("oid", "access");
 
-        ActionExecutionDelegate next = () =>
+        await filterAttribute.OnActionExecutionAsync(context, Next);
+
+        Assert.That(context.HttpContext.Items.Single(keyValuePair => keyValuePair.Key.ToString() == "ActionUserId").Value.ToString() == _userId, Is.EqualTo(true));
+
+        Assert.That(context.HttpContext.Items.Single(keyValuePair => keyValuePair.Key.ToString() == "ActionUserRoles").Value.ToString() == _role, Is.EqualTo(true));
+
+        Task<ActionExecutedContext> Next()
         {
             var actionExecutedContext = new ActionExecutedContext(context, [], Mock.Of<Controller>());
             return Task.FromResult(actionExecutedContext);
-        };
-
-        await filterAttribute.OnActionExecutionAsync(context, next);
-
-        Assert.That(context.HttpContext.Items.Single(i => i.Key.ToString() == "ActionUserId").Value.ToString() == _userId, Is.EqualTo(true));
-
-        Assert.That(context.HttpContext.Items.Single(i => i.Key.ToString() == "ActionUserRoles").Value.ToString() == _role, Is.EqualTo(true));
+        }
     }
 
     private ActionExecutingContext GetExecutingContext(string userIdClaimType, string roleClaimType)

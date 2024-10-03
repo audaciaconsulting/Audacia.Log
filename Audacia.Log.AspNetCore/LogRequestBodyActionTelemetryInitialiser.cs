@@ -12,6 +12,9 @@ namespace Audacia.Log.AspNetCore;
 /// </summary>
 public sealed class LogRequestBodyActionTelemetryInitialiser : ITelemetryInitializer
 {
+    /// <summary>
+    /// Custom property name of action arguments.
+    /// </summary>
     internal const string ActionArguments = "ActionArguments";
 
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -19,7 +22,7 @@ public sealed class LogRequestBodyActionTelemetryInitialiser : ITelemetryInitial
     /// <summary>
     /// Creates an instance of LogRequestBodyActionTelemetryInitialiser.
     /// </summary>
-    /// <param name="httpContextAccessor">Http context accessor</param>
+    /// <param name="httpContextAccessor">Http context accessor.</param>
     public LogRequestBodyActionTelemetryInitialiser(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor ??

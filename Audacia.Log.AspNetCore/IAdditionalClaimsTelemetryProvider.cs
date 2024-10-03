@@ -4,7 +4,7 @@ using System.Security.Claims;
 namespace Audacia.Log.AspNetCore;
 
 /// <summary>
-/// Gets additional claims for TelemetryInitialisers.
+/// Gets additional claims for Telemetry Initialisers.
 /// </summary>
 public interface IAdditionalClaimsTelemetryProvider
 {

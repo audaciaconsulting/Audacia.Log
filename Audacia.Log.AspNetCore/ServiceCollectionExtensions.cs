@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Audacia.Log.AspNetCore.Configuration;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
 using Microsoft.AspNetCore.Http;
@@ -13,8 +15,11 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Configures default application insights configuration and logging of request data.
     /// </summary>
+    /// <param name="services">Service collection.</param>
+    /// <param name="configuration">Configuration.</param>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
+    /// <returns>Service collection with add claims telemetry.</returns>
     public static IServiceCollection ConfigureApplicationInsights(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -52,8 +57,11 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Configures logging of the request and responses body for all actions.
     /// </summary>
+    /// <param name="services">Service collection.</param>
+    /// <param name="configuration">Configuration.</param>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
+    /// <returns>Service collection with add claims telemetry.</returns>
     public static IServiceCollection ConfigureActionContentLogging(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -80,8 +88,9 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// This will inject <see cref="LogRequestBodyActionTelemetryInitialiser" />.
     /// </summary>
-    /// <param name="services"></param>
+    /// <param name="services">Service collection.</param>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+    /// <returns>Service collection with action request body telemetry.</returns>
     public static IServiceCollection AddActionRequestBodyTelemetry(this IServiceCollection services)
     {
         if (services == null)
@@ -98,8 +107,9 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// This will inject <see cref="LogResponseBodyActionTelemetryInitialiser" />.
     /// </summary>
-    /// <param name="services"></param>
+    /// <param name="services">Service collection.</param>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+    /// <returns>Service collection with add action response body telemetry.</returns>
     public static IServiceCollection AddActionResponseBodyTelemetry(this IServiceCollection services)
     {
         if (services == null)
@@ -114,10 +124,13 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configures logging of the http bodies for all http dependency requests.
+    /// Configures logging of the bodies of HTTP requests for all Dependency of type HTTP requests.
     /// </summary>
+    /// <param name="services">Service collection.</param>
+    /// <param name="configuration">Configuration.</param>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
+    /// <returns>Service collection with configured dependency body content.</returns>
     public static IServiceCollection ConfigureDependencyBodyContentLogging(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -136,7 +149,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
         // Configure global configuration for the LogActionFilter
-        services.Configure<LogActionFilterConfig>(configuration.GetSection("LogActionFilter"));
+        services.Configure<LogActionFilterConfig>(configuration.GetSection("LogDependencyFilter"));
 
         return services;
     }
@@ -144,8 +157,9 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// This will inject <see cref="HttpDependencyBodyCaptureTelemetryInitializer" />.
     /// </summary>
-    /// <param name="services"></param>
+    /// <param name="services">Service collection.</param>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+    /// <returns>Service collection with add dependency body telemetry.</returns>
     public static IServiceCollection AddDependencyBodyTelemetry(this IServiceCollection services)
     {
         if (services == null)
@@ -162,8 +176,9 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// This will inject <see cref="IAdditionalClaimsTelemetryProvider" /> and <see cref="LogClaimsActionTelemetryInitialiser" />.
     /// </summary>
-    /// <param name="services"></param>
-    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>    
+    /// <param name="services">Service collection.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+    /// <returns>Service collection with add claims telemetry.</returns>
     public static IServiceCollection AddClaimsTelemetry(this IServiceCollection services)
     {
         if (services == null)
@@ -171,15 +186,18 @@ public static class ServiceCollectionExtensions
             throw new ArgumentNullException(nameof(services));
         }
 
-        return AddClaimsTelemetry(services, new CustomAdditionalClaimsTelemetryProvider((_) => { return []; }));
+        return AddClaimsTelemetry(
+            services,
+            new CustomAdditionalClaimsTelemetryProvider(_ => new List<ClaimsData>()));
     }
 
     /// <summary>
     /// This will inject <see cref="IAdditionalClaimsTelemetryProvider" />.
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="additionalClaimsTelemetryProvider"></param>
+    /// <param name="services">Service collection.</param>
+    /// <param name="additionalClaimsTelemetryProvider">Additional claims telemetry provider.</param>
     /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null"/>.</exception>
+    /// <returns>Service collection with add claims telemetry with additional claims telemetry.</returns>
     public static IServiceCollection AddClaimsTelemetry(
         this IServiceCollection services,
         IAdditionalClaimsTelemetryProvider additionalClaimsTelemetryProvider)
