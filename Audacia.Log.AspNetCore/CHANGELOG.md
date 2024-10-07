@@ -2,10 +2,6 @@
 
 ### v4.0.0 - 2024-10-07
 
-### Breaking
-
-- Renamed `AddRequestBodyTelemetry` to `AddActionRequestBodyTelemetry` and setup from `service.AddRequestBodyTelemetry()` to `services.AddActionRequestBodyTelemetry`
-
 ### Added
 
 - A new telemetry initialiser and Action filter for enrich response body from ASPNET API actions. (
@@ -15,6 +11,7 @@
 
 ### Changed
 
+- **Breaking:** Renamed `AddRequestBodyTelemetry` to `AddActionRequestBodyTelemetry` and setup from `service.AddRequestBodyTelemetry()` to `services.AddActionRequestBodyTelemetry()`
 - Added configuration to enforce code analysis for `Audacia.Log`, `Audacia.Log.AspNetCore`
   and `Audacia.Log.AspNetCore.Tests`.
     - Fixed all violation from enforce static analysis.
