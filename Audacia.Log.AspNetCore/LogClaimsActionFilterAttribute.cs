@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Audacia.Log.AspNetCore.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -22,13 +21,14 @@ public sealed class LogClaimsActionFilterAttribute : ActionFilterAttribute
 
     /// <summary>Gets the names of arguments to exclude from the logs.</summary>
     public ICollection<string> ExcludeArguments { get; } =
-    [
-        "username",
-        "password",
-        "email",
-        "token",
-        "bearer"
-    ];
+        new List<string>()
+        {
+            "username",
+            "password",
+            "email",
+            "token",
+            "bearer"
+        };
 
     /// <summary>
     /// Gets or sets id claim name.
@@ -44,14 +44,16 @@ public sealed class LogClaimsActionFilterAttribute : ActionFilterAttribute
     /// Initializes a new instance of the <see cref="LogClaimsActionFilterAttribute"/> class.
     /// Creates a new instance of <see cref="ActionFilterAttribute"/>.
     /// </summary>
-    [SuppressMessage("Design", "CA1019:Define accessors for attribute arguments", Justification = "Options does not need to a corresponding property.")]
-    public LogClaimsActionFilterAttribute(IOptions<LogActionFilterConfig> options) 
+    /// <param name="options">Options for <see cref="LogActionFilterConfig"/>.</param>
+    public LogClaimsActionFilterAttribute(IOptions<LogActionFilterConfig> options)
     {
         Configure(options?.Value);
     }
 
     /// <inheritdoc/>
-    public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next) 
+    public override Task OnActionExecutionAsync(
+        ActionExecutingContext context,
+        ActionExecutionDelegate next)
     {
         var httpContext = context?.HttpContext;
 
@@ -61,21 +63,27 @@ public sealed class LogClaimsActionFilterAttribute : ActionFilterAttribute
 
             AddUserInfo(httpContext.User, httpContext);
 
-            AddClaims(httpContext.User, httpContext, (Type type, object obj) => 
-            {
-                var newObj = Convert.ChangeType(obj, type, CultureInfo.InvariantCulture);
-                return new List<string>();
-            });
+            AddClaims(
+                httpContext.User,
+                httpContext);
         }
 
         return base.OnActionExecutionAsync(context, next);
     }
 
-    private void AddUserInfo(IPrincipal principal, HttpContext httpContext)
+    private void AddUserInfo(
+        IPrincipal principal,
+        HttpContext httpContext)
     {
-        if (principal?.Identity?.IsAuthenticated != true) { return; }
+        if (principal?.Identity?.IsAuthenticated != true)
+        {
+            return;
+        }
 
-        if (!(principal.Identity is ClaimsIdentity identity)) { return; }
+        if (principal is not { Identity: ClaimsIdentity identity })
+        {
+            return;
+        }
 
         var userId = identity.FindFirst(IdClaimName)?.Value;
         if (!string.IsNullOrEmpty(userId))
@@ -90,11 +98,19 @@ public sealed class LogClaimsActionFilterAttribute : ActionFilterAttribute
         }
     }
 
-    private void AddClaims(IPrincipal principal, HttpContext httpContext, Func<Type, object, List<string>> selector)
+    private void AddClaims(
+        IPrincipal principal,
+        HttpContext httpContext)
     {
-        if (principal?.Identity?.IsAuthenticated != true) { return; }
+        if (principal?.Identity?.IsAuthenticated != true)
+        {
+            return;
+        }
 
-        if (!(principal.Identity is ClaimsIdentity identity)) { return; }
+        if (principal is not { Identity: ClaimsIdentity identity })
+        {
+            return;
+        }
 
         var claims = identity.Claims
             .Where(claim => IncludeClaims.Contains(claim.Subject.Name))
@@ -103,11 +119,13 @@ public sealed class LogClaimsActionFilterAttribute : ActionFilterAttribute
 
         if (claims.Any())
         {
-            httpContext.Items.Add(LogClaimsActionTelemetryInitialiser.ActionClaims, $"{{ {string.Join(", ", claims)} }}");
+            httpContext.Items.Add(
+                LogClaimsActionTelemetryInitialiser.ActionClaims,
+                $"{{ {string.Join(", ", claims)} }}");
         }
     }
 
-    private void Configure(LogActionFilterConfig? config) 
+    private void Configure(LogActionFilterConfig? config)
     {
         if (config == null)
         {
@@ -123,7 +141,7 @@ public sealed class LogClaimsActionFilterAttribute : ActionFilterAttribute
         RoleClaimName = config.RoleClaimType;
     }
 
-    private void SetExcludeArguments(LogActionFilterConfig config) 
+    private void SetExcludeArguments(LogActionFilterConfig config)
     {
         foreach (var item in config.ExcludeArguments ?? Enumerable.Empty<string>())
         {
@@ -136,7 +154,7 @@ public sealed class LogClaimsActionFilterAttribute : ActionFilterAttribute
         }
     }
 
-    private void SetIncludeClaims(LogActionFilterConfig config) 
+    private void SetIncludeClaims(LogActionFilterConfig config)
     {
         foreach (var item in config.IncludeClaims ?? Enumerable.Empty<string>())
         {
@@ -155,11 +173,12 @@ public sealed class LogClaimsActionFilterAttribute : ActionFilterAttribute
         return context.ActionDescriptor.FilterDescriptors
             .Select(descriptor => descriptor.Filter)
             .OfType<LogFilterAttribute>()
-            .Select(attribute => new LogActionFilterConfig
-            {
-                ExcludeArguments = attribute.ExcludeArguments,
-                IncludeClaims = attribute.IncludeClaims
-            })
+            .Select(
+                attribute => new LogActionFilterConfig
+                {
+                    ExcludeArguments = attribute.ExcludeArguments.ToList(),
+                    IncludeClaims = attribute.IncludeClaims.ToList()
+                })
             .FirstOrDefault();
     }
 }

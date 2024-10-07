@@ -12,18 +12,21 @@ namespace Audacia.Log.AspNetCore;
 /// </summary>
 public sealed class LogRequestBodyActionTelemetryInitialiser : ITelemetryInitializer
 {
+    /// <summary>
+    /// Custom property name of action arguments.
+    /// </summary>
     internal const string ActionArguments = "ActionArguments";
 
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
-    /// Creates an instance of RequestDataTelemetryInitialiser.
+    /// Creates an instance of LogRequestBodyActionTelemetryInitialiser.
     /// </summary>
-    /// <param name="httpContextAccessor">Http context accessor</param>
+    /// <param name="httpContextAccessor">Http context accessor.</param>
     public LogRequestBodyActionTelemetryInitialiser(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor ??
-            throw new ArgumentNullException(nameof(httpContextAccessor));
+                               throw new ArgumentNullException(nameof(httpContextAccessor));
     }
 
     /// <inheritdoc/>
@@ -35,7 +38,8 @@ public sealed class LogRequestBodyActionTelemetryInitialiser : ITelemetryInitial
             return;
         }
 
-        if (_httpContextAccessor.HttpContext?.HasFormData() == true && _httpContextAccessor.HttpContext.Items.ContainsKey(ActionArguments))
+        if (_httpContextAccessor.HttpContext?.HasFormData() == true &&
+            _httpContextAccessor.HttpContext.Items.ContainsKey(ActionArguments))
         {
             var logPropertyData = _httpContextAccessor.HttpContext.Items[ActionArguments].ToString();
             requestTelemetry.Properties.Add("Arguments", logPropertyData);

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using Audacia.Log.AspNetCore.Configuration;
 using Audacia.Log.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -27,31 +27,40 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
 
     /// <summary>Gets the names of arguments to exclude from the logs.</summary>
     public ICollection<string> ExcludeArguments { get; } =
-    [
-        "username",
-        "password",
-        "email",
-        "token",
-        "bearer"
-    ];
+        new List<string>()
+        {
+            "username",
+            "password",
+            "email",
+            "token",
+            "access_token",
+            "id_token",
+            "bearer",
+            "name",
+            "firstname",
+            "lastname",
+            "phonenumber",
+            "dateofbirth"
+        };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LogRequestBodyActionFilterAttribute"/> class.
     /// Creates a new instance of <see cref="ActionFilterAttribute"/>.
     /// </summary>
     /// <param name="options">Global log filter configuration.</param>
-    [SuppressMessage("Design", "CA1019:Define accessors for attribute arguments", Justification = "Options does not need to a corresponding property.")]
-    public LogRequestBodyActionFilterAttribute(IOptions<LogActionFilterConfig> options) 
+    public LogRequestBodyActionFilterAttribute(IOptions<LogActionFilterConfig> options)
     {
         Configure(options?.Value);
     }
 
     /// <inheritdoc/>
-    public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    public override Task OnActionExecutionAsync(
+        ActionExecutingContext context,
+        ActionExecutionDelegate next)
     {
         var httpContext = context?.HttpContext;
 
-        if (httpContext != default) 
+        if (httpContext != default)
         {
             Configure(GetControllerActionFilter(context!));
         }
@@ -68,7 +77,7 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
     /// Applies configuration to the log filter if provided.
     /// </summary>
     /// <param name="config">global or action config.</param>
-    private void Configure(LogActionFilterConfig? config) 
+    private void Configure(LogActionFilterConfig? config)
     {
         if (config == null)
         {
@@ -93,12 +102,17 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
         }
     }
 
-    private void AddBodyContent(ActionExecutingContext context, HttpContext httpContext)
+    private void AddBodyContent(
+        ActionExecutingContext context,
+        HttpContext httpContext)
     {
-        if (DisableBodyContent) { return; }
+        if (DisableBodyContent)
+        {
+            return;
+        }
 
         // Copy action content and remove PII
-        var arguments = new ActionArgumentDictionary(context.ActionArguments, MaxDepth, ExcludeArguments);
+        var arguments = new RedactionDictionary(context.ActionArguments, MaxDepth, ExcludeArguments);
 
         if (arguments.Any())
         {
@@ -112,12 +126,13 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
         return context.ActionDescriptor.FilterDescriptors
             .Select(descriptor => descriptor.Filter)
             .OfType<LogFilterAttribute>()
-            .Select(attribute => new LogActionFilterConfig
-            {
-                ExcludeArguments = attribute.ExcludeArguments,
-                MaxDepth = attribute.MaxDepth,
-                DisableBodyContent = attribute.DisableBodyContent
-            })
+            .Select(
+                attribute => new LogActionFilterConfig
+                {
+                    ExcludeArguments = attribute.ExcludeArguments.ToList(),
+                    MaxDepth = attribute.MaxDepth,
+                    DisableBodyContent = attribute.DisableBodyContent
+                })
             .FirstOrDefault();
     }
 }

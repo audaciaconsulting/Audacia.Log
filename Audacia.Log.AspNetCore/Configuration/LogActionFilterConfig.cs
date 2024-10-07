@@ -1,13 +1,17 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
-namespace Audacia.Log.AspNetCore;
+namespace Audacia.Log.AspNetCore.Configuration;
 
 /// <summary>
 /// Allows the configuration of the <see cref="LogClaimsActionFilterAttribute "/> and <see cref="LogRequestBodyActionFilterAttribute "/> per request.
 /// </summary>
 public sealed class LogActionFilterConfig
 {
+    /// <summary>
+    /// Gets the location of where the config should be located.
+    /// </summary>
+    public const string Location = "LogActionFilter";
+
     /// <summary>
     /// Gets or sets the names of arguments to exclude from the logs.
     /// </summary>
@@ -24,7 +28,7 @@ public sealed class LogActionFilterConfig
     public bool DisableBodyContent { get; set; }
 
     /// <summary>
-    /// Gets or sets the max depth for desconstructing objects in the request body.
+    /// Gets or sets the max depth for deconstructing objects in the request body.
     /// </summary>
     public int MaxDepth { get; set; }
 

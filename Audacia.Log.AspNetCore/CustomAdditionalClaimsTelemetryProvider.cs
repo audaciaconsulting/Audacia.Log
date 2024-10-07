@@ -14,7 +14,7 @@ public class CustomAdditionalClaimsTelemetryProvider : IAdditionalClaimsTelemetr
     /// <summary>
     /// Initialise the claimsGetter Func.
     /// </summary>
-    /// <param name="claimsGetter"></param>
+    /// <param name="claimsGetter">Claims getters.</param>
     public CustomAdditionalClaimsTelemetryProvider(Func<IEnumerable<Claim>, List<ClaimsData>> claimsGetter)
     {
         _claimsGetter = claimsGetter;
@@ -24,10 +24,9 @@ public class CustomAdditionalClaimsTelemetryProvider : IAdditionalClaimsTelemetr
     /// Gets additional claims.
     /// </summary>
     /// <param name="claims">User claims <see cref="Claim"/> collection.</param>
-    /// <returns>List of Tuples(Name,Data).</returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <returns>List of <see cref="ClaimsData"/>.</returns>
     public List<ClaimsData> GetClaims(IEnumerable<Claim> claims)
     {
-       return _claimsGetter(claims);
+        return _claimsGetter(claims);
     }
 }

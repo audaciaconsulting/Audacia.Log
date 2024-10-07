@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Audacia.Log.AspNetCore;
@@ -10,7 +11,7 @@ namespace Audacia.Log.AspNetCore;
 /// To use place above a controller action and specify one or more parameters.
 /// [LogFilter(DisableBodyContent = true)]
 /// [LogFilter(ExcludeArguments = new[] { "password" })]
-/// [LogFilter(IncludeClaims = new[] { "user.search" })]
+/// [LogFilter(IncludeClaims = new[] { "user.search" })].
 /// </example>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public sealed class LogFilterAttribute : Attribute, IFilterMetadata
@@ -18,12 +19,12 @@ public sealed class LogFilterAttribute : Attribute, IFilterMetadata
     /// <summary>
     /// Gets or sets the names of arguments to exclude from the logs.
     /// </summary>
-    public string[] ExcludeArguments { get; set; } = [];
+    public IEnumerable<string> ExcludeArguments { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets the names of claims to include in the logs.
     /// </summary>
-    public string[] IncludeClaims { get; set; } = [];
+    public IEnumerable<string> IncludeClaims { get; set; } = new List<string>();
 
     /// <summary>
     /// Gets or sets a value indicating whether the request body data should be logged.
@@ -31,7 +32,7 @@ public sealed class LogFilterAttribute : Attribute, IFilterMetadata
     public bool DisableBodyContent { get; set; }
 
     /// <summary>
-    /// Gets or sets the max depth for desconstructing objects in the request body.
+    /// Gets or sets the max depth for deconstructing objects in the request body.
     /// </summary>
     public int MaxDepth { get; set; }
 }
