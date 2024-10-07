@@ -8,6 +8,11 @@ namespace Audacia.Log.AspNetCore.Configuration;
 public sealed class LogDependencyFilterConfig
 {
     /// <summary>
+    /// Gets the location of where the config should be located.
+    /// </summary>
+    public const string Location = "LogDependencyFilter";
+
+    /// <summary>
     /// Gets or sets the names of arguments to exclude from the logs.
     /// </summary>
     public IReadOnlyCollection<string> ExcludeArguments { get; set; } = new List<string>();

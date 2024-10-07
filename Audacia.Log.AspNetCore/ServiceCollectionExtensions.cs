@@ -80,7 +80,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
         // Configure global configuration for the LogActionFilter
-        services.Configure<LogActionFilterConfig>(configuration.GetSection("LogActionFilter"));
+        services.Configure<LogActionFilterConfig>(configuration.GetSection(LogActionFilterConfig.Location));
 
         return services;
     }
@@ -149,7 +149,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
         // Configure global configuration for the LogActionFilter
-        services.Configure<LogActionFilterConfig>(configuration.GetSection("LogDependencyFilter"));
+        services.Configure<LogDependencyFilterConfig>(configuration.GetSection(LogDependencyFilterConfig.Location));
 
         return services;
     }

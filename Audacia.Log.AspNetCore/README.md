@@ -86,7 +86,11 @@ services.AddClaimsTelemetry(new CustomAdditionalClaimsTelemetryProvider((user) =
 ```
 
 ### RequestBodyActionLogFilter
-This filter can be registered to include logs for the beginning and end of each Action Method. This only includes request parameters as well as details of the response such as the type of model returned. Register it like so:
+This enrichment captures the arguments/ payload passed to an action method in an ASP.NET API endpoint. These arguments include query parameters, route values, form data, and complex objects (e.g., JSON payloads) passed in the request body.
+
+Usage: By logging this data, you gain visibility into what input your API actions are receiving, allowing for better debugging, validation, and performance tuning. This also helps in diagnosing input-related errors or unexpected behavior when specific argument values are provided.
+
+Register it like so:
 
 ```csharp
 using Audacia.Log.AspNetCore;
@@ -102,7 +106,11 @@ public void ConfigureServices(IServiceCollection services)
 ```
 
 ### ResponseBodyActionLogFilter
-This filter can be registered to include logs for the beginning and end of each Action Method. This only includes response body as well as details of the response such as the type of model returned. Register it like so:
+This enrichment captures the response body sent back from the API or function. It includes the full content returned to the client, which can be valuable for tracing issues related to responses, errors, or unexpected results.
+
+Usage: The response body data is useful for understanding what your API or function returned to a user or system, enabling the monitoring of output correctness and performance issues.
+
+Register it like so:
 
 ```csharp
 using Audacia.Log.AspNetCore;
