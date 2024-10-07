@@ -112,6 +112,11 @@ public class HttpDependencyBodyCaptureTelemetryInitializer : ITelemetryInitializ
     /// <inheritdoc />
     public void Initialize(ITelemetry telemetry)
     {
+        if (DisableHttpTracking)
+        {
+            return;
+        }
+
         if (telemetry is DependencyTelemetry dependencyTelemetry &&
             dependencyTelemetry.TryGetOperationDetail("HttpResponse", out object responseObj) &&
             responseObj is HttpResponseMessage response)
