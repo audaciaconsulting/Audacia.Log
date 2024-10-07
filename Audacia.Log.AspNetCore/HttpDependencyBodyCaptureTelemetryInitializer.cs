@@ -35,7 +35,7 @@ public class HttpDependencyBodyCaptureTelemetryInitializer : ITelemetryInitializ
     /// <summary>
     /// Gets or sets a value indicating whether the HTTP dependencies should be captured and logged.
     /// </summary>
-    public bool DisabledHttpTracking { get; set; }
+    public bool DisableHttpTracking { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to log out the request body from HTTP dependency requests.
@@ -104,7 +104,7 @@ public class HttpDependencyBodyCaptureTelemetryInitializer : ITelemetryInitializ
 
     private void MapHttpDependencyConfiguration(LogDependencyFilterConfig config)
     {
-        DisabledHttpTracking = config.DisableHttpTracking;
+        DisableHttpTracking = config.DisableHttpTracking;
         DisableHttpRequestBody = config.DisableHttpRequestBody;
         DisableHttpResponseBody = config.DisableHttpResponseBody;
     }
