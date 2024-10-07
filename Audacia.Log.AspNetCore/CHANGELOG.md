@@ -2,6 +2,10 @@
 
 ### v4.0.0 - 2024-10-07
 
+### Breaking
+
+- Renamed `AddRequestBodyTelemetry` to `AddActionRequestBodyTelemetry` and setup from `service.AddRequestBodyTelemetry()` to `services.AddActionRequestBodyTelemetry`
+
 ### Added
 
 - A new telemetry initialiser and Action filter for enrich response body from ASPNET API actions. (
