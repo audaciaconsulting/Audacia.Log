@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-### v0.3.0 - 2024-08-05
+### v0.3.1 - 2024-08-05
 ### Added
 - No new functionality added
 
