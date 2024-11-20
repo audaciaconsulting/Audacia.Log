@@ -1,6 +1,16 @@
 ﻿# Changelog
 
-### v4.0.0 - 2024-10-07
+## 4.0.1 - 2024-11-20
+### Added
+- No new functionality added
+
+### Changed
+- No functionality changed
+
+### Fixed
+- Updated vulnerable dependencies ([#8](https://github.com/audaciaconsulting/Audacia.Log/pull/8))
+
+## 4.0.0 - 2024-10-07
 
 ### Added
 
@@ -16,7 +26,7 @@
   and `Audacia.Log.AspNetCore.Tests`.
     - Fixed all violation from enforce static analysis.
 
-### v3.0.0 - 2024-07-25
+## 3.0.0 - 2024-07-25
 
 ### Added
 

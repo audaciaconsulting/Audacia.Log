@@ -7,6 +7,7 @@ This repository contains 3 packages for implementing logging into your applicati
 # Change History
 
 The `Audacia.Log` repository change history can be found in the following changelogs:
+- Audacia.Log [changelog](Audacia.Log/CHANGELOG.md)
 - Audacia.Log.AspNet4 [changelog](Audacia.Log.AspNet4/CHANGELOG.md)
 - Audacia.Log.AspNetCore [changelog](Audacia.Log.AspNetCore/CHANGELOG.md)
 
