@@ -1,6 +1,16 @@
 ﻿# Changelog
 
-### v0.3.1 - 2024-08-05
+## 0.3.2 - 2024-11-20
+### Added
+- No new functionality added
+
+### Changed
+- No functionality changed
+
+### Fixed
+- Updated vulnerable dependencies ([#8](https://github.com/audaciaconsulting/Audacia.Log/pull/8))
+
+## 0.3.1 - 2024-08-05
 ### Added
 - No new functionality added
 
