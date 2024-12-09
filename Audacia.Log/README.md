@@ -1,7 +1,7 @@
 ﻿## Audacia.Log
 
 Standardized logging configuration for Audacia projects using [Serilog](https://serilog.net).
-This package should only be added if the application is a legacy, if ASP.NET Core use [Audacia.Log.AspNetCore](https://dev.azure.com/audacia/Audacia/_git/Audacia.Log?path=%2FAudacia.Log.AspNetCore&_a=readme) instead.
+This package should only be added if the application is a legacy, if ASP.NET Core use [Audacia.Log.AspNetCore](https://github.com/audaciaconsulting/Audacia.Log) instead.
 
 ### Usage
 
