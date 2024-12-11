@@ -14,7 +14,6 @@ public class LogRequestBodyActionFilterAttributeTests
 {
     private readonly Tuple<string, string> _returnUrl = new("returnUrl", "someUrl");
 
-    private readonly Tuple<string, string> _requestId = new("requestId", "0");
 
     [Test]
     public async Task WhenUsingLogRequestBodyActionFilterItAddsActionArgumentsToContextItemsAsync()
