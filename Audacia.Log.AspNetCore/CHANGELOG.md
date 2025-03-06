@@ -1,5 +1,15 @@
 ﻿# Changelog
 
+## 4.0.2 - 2025-03-06
+### Added
+- No new functionality added
+
+### Changed
+- No functionality changed
+
+### Fixed
+- Reverted changes to the LogFilter attribute arguments back to compile-time constant types. ([#11](https://github.com/audaciaconsulting/Audacia.Log/pull/11))
+
 ## 4.0.1 - 2024-11-20
 ### Added
 - No new functionality added
