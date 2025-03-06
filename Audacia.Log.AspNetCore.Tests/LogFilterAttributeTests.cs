@@ -16,8 +16,10 @@ public class LogFilterAttributeTests
         Type[] validAttributeParameterTypes =
         [
             typeof(string),
-            typeof(int), typeof(double), typeof(bool),
-            typeof(Type), typeof(Enum),
+            typeof(int),
+            typeof(double),
+            typeof(bool),
+            typeof(Enum),
             typeof(string[])
         ];
 
