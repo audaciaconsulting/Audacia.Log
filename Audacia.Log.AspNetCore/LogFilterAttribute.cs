@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Audacia.Log.AspNetCore;
@@ -19,12 +18,12 @@ public sealed class LogFilterAttribute : Attribute, IFilterMetadata
     /// <summary>
     /// Gets or sets the names of arguments to exclude from the logs.
     /// </summary>
-    public IEnumerable<string> ExcludeArguments { get; set; } = new List<string>();
+    public string[]? ExcludeArguments { get; set; }
 
     /// <summary>
     /// Gets or sets the names of claims to include in the logs.
     /// </summary>
-    public IEnumerable<string> IncludeClaims { get; set; } = new List<string>();
+    public string[]? IncludeClaims { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the request body data should be logged.
