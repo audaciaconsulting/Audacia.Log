@@ -19,6 +19,9 @@ stages:
     displayName: Build
     jobs:
       - template: src/build/dotnet/jobs/nuget-package.job.yaml@templates
+        parameters:
+          projects: 'Audacia.Log.AspNetCore/Audacia.Log.AspNetCore.csproj'
+          workingDirectory: 'Audacia.Log.AspNetCore'
 
   - stage: Stage_Release
     displayName: Release
