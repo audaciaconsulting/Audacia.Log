@@ -183,7 +183,7 @@ For example using "phonenumber" as the value will filter: PhoneNumber, MobilePho
     "DisableHttpRequestBody": false,
     "DisableHttpResponseBody": false,
     "MaxDepth":  10,
-    "ExcludeArguments": [ "password", "token", "apikey" ]
+    "ExcludeArguments": [ "password", "token", "apikey", "secret", "access_token", "refresh_token", "credential" ]
  }
 }
 ```
