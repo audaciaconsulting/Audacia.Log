@@ -129,7 +129,7 @@ public sealed class LogRequestBodyActionFilterAttribute : ActionFilterAttribute
             .Select(
                 attribute => new LogActionFilterConfig
                 {
-                    ExcludeArguments = attribute.ExcludeArguments.ToList(),
+                    ExcludeArguments = attribute.ExcludeArguments?.ToList() ?? new List<string>(),
                     MaxDepth = attribute.MaxDepth,
                     DisableBodyContent = attribute.DisableBodyContent
                 })
