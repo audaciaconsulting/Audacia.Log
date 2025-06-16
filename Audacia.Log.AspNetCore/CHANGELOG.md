@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 4.0.3 - 2025-06-16
+### Added
+- Bug fix LogFilter attribute without `ExcludeArguments` throw null reference exception
+
 ## 4.0.2 - 2025-03-06
 ### Added
 - No new functionality added
