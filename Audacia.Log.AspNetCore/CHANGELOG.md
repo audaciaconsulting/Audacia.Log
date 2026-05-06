@@ -1,5 +1,16 @@
 ﻿# Changelog
 
+## 4.1.0 - 2026-05-06
+### Added 
+- No new functionality added
+
+### Removed
+- No functionality removed
+
+### Changed
+- Upgraded all package dependencies to the latest compatible versions.
+- Upgraded test project to .NET 10.
+
 ## 4.0.3 - 2025-06-16
 ### Added
 - Bug fix LogFilter attribute without `ExcludeArguments` throw null reference exception
@@ -9,7 +20,8 @@
 - No new functionality added
 
 ### Changed
-- No functionality changed
+- Replaced deprecated `Microsoft.ApplicationInsights` packages with `Azure.Monitor.OpenTelemetry.AspNetCore`
+  - ***IMPORTANT***: `APPINSIGHTS_INSTRUMENTATIONKEY` `var` is not longer supported and must be replaced with `APPINSIGHTS_CONNECTION_STRING`.
 
 ### Fixed
 - Reverted changes to the LogFilter attribute arguments back to compile-time constant types. ([#11](https://github.com/audaciaconsulting/Audacia.Log/pull/11))

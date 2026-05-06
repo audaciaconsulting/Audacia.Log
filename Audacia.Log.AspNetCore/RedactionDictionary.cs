@@ -96,7 +96,6 @@ public sealed class RedactionDictionary : Dictionary<string, object>
             IncludeObject(
                 name,
                 data,
-                type,
                 depth,
                 parent);
             return;
@@ -150,15 +149,15 @@ public sealed class RedactionDictionary : Dictionary<string, object>
         }
     }
 
-    [MaxParameterCount(5)]
+    [MaxParameterCount(5, Justification = "Justification added during maintenance, the method is doing .")]
     private void IncludeObject(
         string name,
         object data,
-        Type type,
         int depth,
         IDictionary<string, object> parent)
     {
         var objectData = new Dictionary<string, object>();
+        var type = data.GetType();
 
         // Append safe fields to objectData
         foreach (var fieldInfo in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
@@ -179,7 +178,7 @@ public sealed class RedactionDictionary : Dictionary<string, object>
         }
     }
 
-    [MaxMethodLength(15)]
+    [MaxMethodLength(15, Justification = "String builder appends grouped for readability.")]
     private static StringBuilder AppendDictionary(
         StringBuilder builder,
         IDictionary<string, object> dictionary)
@@ -229,7 +228,7 @@ public sealed class RedactionDictionary : Dictionary<string, object>
         builder.AppendFormat(CultureInfo.InvariantCulture, "\"{0}\"", value.Replace("\"", "\\\""));
     }
 
-    [MaxMethodLength(14)]
+    [MaxMethodLength(14, Justification = "String builder appends grouped for readability.")]
     private static void AppendValueCollection(
         StringBuilder builder,
         ValueCollection valueCollection)
