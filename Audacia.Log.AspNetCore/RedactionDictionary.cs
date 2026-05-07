@@ -60,7 +60,7 @@ public sealed class RedactionDictionary : Dictionary<string, object>
         return AppendDictionary(new StringBuilder(), this).ToString();
     }
 
-    [MaxMethodLength(13, Justification = "Method is concise and splitting out would not improve readability")]
+    [MaxMethodLength(13, Justification = "Method is concise and splitting out would not improve readability.")]
     private void IncludeData(
         string name,
         object data,
@@ -149,7 +149,7 @@ public sealed class RedactionDictionary : Dictionary<string, object>
         }
     }
 
-    [MaxParameterCount(5, Justification = "Justification added during maintenance, the method is doing .")]
+    [MaxParameterCount(5, Justification = "Method is concise and splitting out would not improve readability.")]
     private void IncludeObject(
         string name,
         object data,
