@@ -20,8 +20,7 @@
 - No new functionality added
 
 ### Changed
-- Replaced deprecated `Microsoft.ApplicationInsights` packages with `Azure.Monitor.OpenTelemetry.AspNetCore`
-  - ***IMPORTANT***: `APPINSIGHTS_INSTRUMENTATIONKEY` `var` is not longer supported and must be replaced with `APPINSIGHTS_CONNECTION_STRING`.
+- No functionality changed
 
 ### Fixed
 - Reverted changes to the LogFilter attribute arguments back to compile-time constant types. ([#11](https://github.com/audaciaconsulting/Audacia.Log/pull/11))
