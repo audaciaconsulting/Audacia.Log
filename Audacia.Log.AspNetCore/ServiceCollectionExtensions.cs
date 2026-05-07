@@ -210,7 +210,7 @@ public static class ServiceCollectionExtensions
         // Add telemetry initialiser to attach request data captured by LogRequestBodyActionFilter
         services.AddSingleton<ITelemetryInitializer, LogClaimsActionTelemetryInitialiser>();
 
-        services.AddSingleton<IAdditionalClaimsTelemetryProvider>(additionalClaimsTelemetryProvider);
+        services.AddSingleton(additionalClaimsTelemetryProvider);
 
         return services;
     }
