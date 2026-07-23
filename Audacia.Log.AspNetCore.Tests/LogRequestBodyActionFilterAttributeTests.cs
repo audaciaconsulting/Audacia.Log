@@ -33,7 +33,7 @@ public class LogRequestBodyActionFilterAttributeTests
 
         Assert.That(context.HttpContext.Items, Has.Count.EqualTo(0));
 
-        await filterAttribute.OnActionExecutionAsync(context, Next);
+        await filterAttribute.OnActionExecutionAsync(context, NextAsync);
 
         var actionArgs = (RedactionDictionary)context.HttpContext.Items
             .Single(keyValuePair => keyValuePair.Key.ToString() == "ActionArguments").Value;
@@ -49,7 +49,7 @@ public class LogRequestBodyActionFilterAttributeTests
             Is.EqualTo(true));
         return;
 
-        Task<ActionExecutedContext> Next()
+        Task<ActionExecutedContext> NextAsync()
         {
             var filterMetadata = new List<IFilterMetadata>();
             var actionExecutedContext = new ActionExecutedContext(context, filterMetadata, Mock.Of<Controller>());
@@ -58,7 +58,7 @@ public class LogRequestBodyActionFilterAttributeTests
     }
 
     [Test]
-    public async Task WhenUsingLogRequestBodyActionFilter_NoExcludeArgumentsExistOnLogFilterAttribute_DoesNotThrowNullReferenceException()
+    public async Task WhenUsingLogRequestBodyActionFilter_NoExcludeArgumentsExistOnLogFilterAttribute_DoesNotThrowNullReferenceExceptionAsync()
     {
         IOptions<LogActionFilterConfig> config = Options.Create(
             new LogActionFilterConfig()
@@ -89,7 +89,7 @@ public class LogRequestBodyActionFilterAttributeTests
 
         Assert.That(context.HttpContext.Items, Has.Count.EqualTo(0));
 
-        await filterAttribute.OnActionExecutionAsync(context, Next);
+        await filterAttribute.OnActionExecutionAsync(context, NextAsync);
 
         var actionArgs = (RedactionDictionary)context.HttpContext.Items
             .Single(keyValuePair => keyValuePair.Key.ToString() == "ActionArguments").Value;
@@ -105,7 +105,7 @@ public class LogRequestBodyActionFilterAttributeTests
             Is.EqualTo(true));
         return;
 
-        Task<ActionExecutedContext> Next()
+        Task<ActionExecutedContext> NextAsync()
         {
             var filterMetadata = new List<IFilterMetadata>();
             var actionExecutedContext = new ActionExecutedContext(context, filterMetadata, Mock.Of<Controller>());
@@ -124,7 +124,8 @@ public class LogRequestBodyActionFilterAttributeTests
         actionDescriptor ??= new ActionDescriptor() { FilterDescriptors = [] };
 
         var filterMetadata = new List<IFilterMetadata>();
-        var context = new ActionExecutingContext(
+
+        return new ActionExecutingContext(
             new ActionContext(
                 httpContext: httpContext,
                 routeData: new RouteData(),
@@ -134,7 +135,5 @@ public class LogRequestBodyActionFilterAttributeTests
             new Dictionary<string, object>()
                 { { _returnUrl.Item1, _returnUrl.Item2 }, { _requestId.Item1, _requestId.Item2 } },
             new Mock<Controller>().Object);
-
-        return context;
     }
 }

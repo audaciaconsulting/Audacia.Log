@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 0.3.3 - 2026-07-23
+### Added
+- Updated Audacia.CodeAnalysis package versions.
+
 ## 0.3.2 - 2024-11-20
 ### Added
 - No new functionality added

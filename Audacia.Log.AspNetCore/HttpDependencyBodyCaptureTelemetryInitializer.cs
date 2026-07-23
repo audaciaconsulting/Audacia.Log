@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -133,6 +134,7 @@ public class HttpDependencyBodyCaptureTelemetryInitializer : ITelemetryInitializ
         }
     }
 
+    [SuppressMessage("Usage", "VSTHRD002:Avoid problematic synchronous waits", Justification = "ITelemetryInitializer.Initialize is synchronous and cannot be awaited.")]
     private void EnrichWithResponseBody(
         HttpResponseMessage response,
         DependencyTelemetry dependencyTelemetry)
@@ -147,6 +149,7 @@ public class HttpDependencyBodyCaptureTelemetryInitializer : ITelemetryInitializ
         }
     }
 
+    [SuppressMessage("Usage", "VSTHRD002:Avoid problematic synchronous waits", Justification = "ITelemetryInitializer.Initialize is synchronous and cannot be awaited.")]
     private void EnrichWithRequestBody(
         HttpResponseMessage response,
         DependencyTelemetry dependencyTelemetry)

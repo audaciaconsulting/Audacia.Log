@@ -1,5 +1,20 @@
 ﻿# Changelog
 
+## 4.1.1 - 2026-06-10
+
+### Added
+- No new functionality added
+
+### Removed
+- No functionality removed
+
+### Changed
+- Upgraded System.Security.Cryptography.Xml package version to address security vulnerability.
+  - https://github.com/dotnet/announcements/issues/419
+- Upgraded Audacia.CodeAnalysis package versions.
+- Upgaded coverlet.collector package version.
+- Upgraded Microsoft.AspNetCore.Mvc package version.
+
 ## 4.1.0 - 2026-05-06
 ### Added 
 - No new functionality added

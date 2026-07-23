@@ -26,7 +26,7 @@ public class LogClaimsActionFilterAttributeTests
 
         var context = GetExecutingContext(ClaimTypes.Sub, ClaimTypes.Role);
 
-        Task<ActionExecutedContext> Next()
+        Task<ActionExecutedContext> NextAsync()
         {
             var actionExecutedContext = new ActionExecutedContext(context, [], Mock.Of<Controller>());
             return Task.FromResult(actionExecutedContext);
@@ -34,7 +34,7 @@ public class LogClaimsActionFilterAttributeTests
 
         Assert.That(context.HttpContext.Items, Has.Count.EqualTo(0));
 
-        await filterAttribute.OnActionExecutionAsync(context, Next);
+        await filterAttribute.OnActionExecutionAsync(context, NextAsync);
 
         Assert.That(context.HttpContext.Items, Has.Count.EqualTo(2));
 
@@ -56,13 +56,13 @@ public class LogClaimsActionFilterAttributeTests
 
         var context = GetExecutingContext("oid", "access");
 
-        await filterAttribute.OnActionExecutionAsync(context, Next);
+        await filterAttribute.OnActionExecutionAsync(context, NextAsync);
 
         Assert.That(context.HttpContext.Items.Single(keyValuePair => keyValuePair.Key.ToString() == "ActionUserId").Value.ToString() == _userId, Is.EqualTo(true));
 
         Assert.That(context.HttpContext.Items.Single(keyValuePair => keyValuePair.Key.ToString() == "ActionUserRoles").Value.ToString() == _role, Is.EqualTo(true));
 
-        Task<ActionExecutedContext> Next()
+        Task<ActionExecutedContext> NextAsync()
         {
             var actionExecutedContext = new ActionExecutedContext(context, [], Mock.Of<Controller>());
             return Task.FromResult(actionExecutedContext);
@@ -88,7 +88,7 @@ public class LogClaimsActionFilterAttributeTests
             User = contextUser
         };
 
-        var context = new ActionExecutingContext(
+        return new ActionExecutingContext(
             new ActionContext(
                    httpContext: httpContext,
                    routeData: new RouteData(),
@@ -97,7 +97,5 @@ public class LogClaimsActionFilterAttributeTests
             [],
             new Dictionary<string, object>(),
             new Mock<Controller>().Object);
-
-        return context;
     }
 }
