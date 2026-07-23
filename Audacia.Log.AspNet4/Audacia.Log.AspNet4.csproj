@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
     <Description>Standardized SeriLog logging configuration for Legacy Audacia Web APIs.</Description>
     <Authors>Audacia</Authors>
     <Copyright>Copyright © Audacia 2020</Copyright>
@@ -29,7 +29,7 @@
     <PackageReference Include="Microsoft.ApplicationInsights.DependencyCollector" Version="2.11.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.PerfCounterCollector" Version="2.11.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.Web" Version="2.11.2" />
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
     <PackageReference Include="Serilog.Enrichers.HttpContextInfo" Version="1.0.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
