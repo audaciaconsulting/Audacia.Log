@@ -3,7 +3,6 @@
 ## 4.1.1 - 2026-06-10
 
 ### Added
-
 - No new functionality added
 
 ### Removed
