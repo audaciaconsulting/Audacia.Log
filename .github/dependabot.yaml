@@ -8,6 +8,9 @@ updates:
       cronjob: "0 6 * * 1"
       timezone: "Etc/UTC"
 
+    commit-message:
+      prefix: "chore"
+
     # Ignore all major version updates.
     ignore:
       - dependency-name: "*"
