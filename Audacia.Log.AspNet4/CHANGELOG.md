@@ -1,5 +1,15 @@
 ﻿# Changelog
 
+## 0.3.4 - 2026-10-30
+
+### Added
+
+- No new functionality added.
+
+### Changed
+
+- Version incremented due to transient package udpates in referenced project Audacia.Log.
+
 ## 0.3.3 - 2026-07-23
 ### Added
 - Updated Audacia.CodeAnalysis package versions.
