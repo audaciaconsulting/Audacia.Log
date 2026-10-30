@@ -1,17 +1,17 @@
 ﻿# Changelog
 
-## 4.2.2 - 2026-10-30
+## 4.1.2 - 2026-10-30
 
 ### Added
 
-- No new functionality added
+- No new functionality added.
 
 ### Changed
 
-- Updated Audacia.CodeAnalysis to version 2.1.0
-- Updated Microsoft.AspNetCore.Mvc to version 2.3.13
-- Updated Microsoft.Extensions.Options.ConfigurationExtensions to version 10.0.13
-- Updated System.Security.Cryptography.Xml to version 10.0.13
+- Updated Audacia.CodeAnalysis to version 2.1.0.
+- Updated Microsoft.AspNetCore.Mvc to version 2.3.13.
+- Updated Microsoft.Extensions.Options.ConfigurationExtensions to version 10.0.13.
+- Updated System.Security.Cryptography.Xml to version 10.0.13.
 
 ## 4.1.1 - 2026-06-10
 

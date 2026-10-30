@@ -4,7 +4,7 @@
 
 ### Added
 
-- Nothing new functionality added.
+- No new functionality added.
 
 ### Changed
 
