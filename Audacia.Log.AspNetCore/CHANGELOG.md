@@ -1,5 +1,17 @@
 ﻿# Changelog
 
+## 4.1.3 - 2026-11-02
+
+### Added
+
+- No new functionality added.
+
+### Changed
+
+- Installed pinned version of Microsoft.Extensions.Options at version 10.0.14.
+- Updated Microsoft.Extensions.Options.ConfigurationExtensions dependency to version 10.0.14.
+- Updated vulnerable dependencies in the unit test project (not published to NuGet).
+
 ## 4.1.2 - 2026-10-30
 
 ### Added
