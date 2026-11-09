@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## 4.1.4 - 2026-11-09
+
+### Changed
+
+- Update System.Security.Cryptography.Xml dependency to version 10.0.14 to address security vulnerability.
+- Updated vulnerable dependencies in the unit test project (not published to NuGet).
+
 ## 4.1.3 - 2026-11-02
 
 ### Added
