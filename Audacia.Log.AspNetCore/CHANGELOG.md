@@ -1,5 +1,14 @@
 ﻿# Changelog
 
+## 4.1.5 - 2026-11-23
+
+### Changed
+
+- Updated System.Security.Cryptography.Xml to version 10.0.15.
+- Updated Microsoft.AspNetCore.Mvc to version 2.3.14.
+- Updated Microsoft.Extensions.Options to version 10.0.15.
+- Updated Microsoft.Extensions.Options.ConfigurationExtensions to version 10.0.15.
+
 ## 4.1.4 - 2026-11-09
 
 ### Changed
