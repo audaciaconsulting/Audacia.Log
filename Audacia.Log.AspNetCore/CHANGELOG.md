@@ -8,6 +8,7 @@
 - Updated Microsoft.AspNetCore.Mvc to version 2.3.14.
 - Updated Microsoft.Extensions.Options to version 10.0.15.
 - Updated Microsoft.Extensions.Options.ConfigurationExtensions to version 10.0.15.
+- Pinned Microsoft.AspNetCore.WebUtilities package version to 2.3.14 to address security vulnerability.
 
 ## 4.1.4 - 2026-11-09
 
